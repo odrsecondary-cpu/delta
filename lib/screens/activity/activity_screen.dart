@@ -9,11 +9,24 @@ import 'widgets/map_panel.dart';
 import 'widgets/metric_card.dart';
 import 'widgets/ride_controls.dart';
 
-class ActivityScreen extends ConsumerWidget {
+class ActivityScreen extends ConsumerStatefulWidget {
   const ActivityScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ActivityScreen> createState() => _ActivityScreenState();
+}
+
+class _ActivityScreenState extends ConsumerState<ActivityScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(activityProvider.notifier).initLocation();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final actState = ref.watch(activityProvider);
 
     return Scaffold(
@@ -38,7 +51,7 @@ class ActivityScreen extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
               child: RideControls(
-                onStopRequested: () => _confirmStop(context, ref),
+                onStopRequested: () => _confirmStop(context),
               ),
             ),
           ],
@@ -47,7 +60,7 @@ class ActivityScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _confirmStop(BuildContext context, WidgetRef ref) async {
+  Future<void> _confirmStop(BuildContext context) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(

@@ -37,7 +37,7 @@ A persistent bottom tab bar provides access to all three main screens. The activ
 
 ## Screen 1 — Activity
 
-> Live tracking screen shown during an active ride.
+> Ride tracking screen. Shows current location on the map immediately on open, even before a ride starts.
 
 ![Activity screen](screen-activity.svg)
 
@@ -48,8 +48,9 @@ A persistent bottom tab bar provides access to all three main screens. The activ
 
 ### Map Area
 
-- Displays a mini map with the current route trace drawn as a green polyline.
-- The rider's current position is shown as a green filled circle with a subtle halo.
+- The map centers on the user's current GPS position as soon as the screen opens, before any ride is started. Position updates continuously while the user is moving.
+- Once a ride is active, the current route trace is drawn as a green polyline.
+- The rider's current position is shown as a green filled circle with a subtle halo at all times (idle, active, and paused).
 
 ### Metric Cards
 

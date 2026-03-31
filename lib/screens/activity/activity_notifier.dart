@@ -8,6 +8,7 @@ import '../../services/gps_service.dart';
 import 'activity_state.dart';
 
 class ActivityNotifier extends Notifier<ActivityState> {
+  StreamSubscription<Position>? _bgLocationSub;
   StreamSubscription<Position>? _gpsSub;
   Timer? _ticker;
 
@@ -16,13 +17,34 @@ class ActivityNotifier extends Notifier<ActivityState> {
   @override
   ActivityState build() {
     ref.onDispose(() {
+      _bgLocationSub?.cancel();
       _gpsSub?.cancel();
       _ticker?.cancel();
     });
     return const ActivityState();
   }
 
+  /// Starts passive position tracking so the map reflects current location
+  /// before a ride begins.
+  Future<void> initLocation() async {
+    if (_bgLocationSub != null) return;
+    final gps = ref.read(gpsServiceProvider);
+    final granted = await gps.requestPermission();
+    if (!granted) {
+      state = state.copyWith(permissionDenied: true);
+      return;
+    }
+    _bgLocationSub = gps.positionStream().listen((pos) {
+      state = state.copyWith(
+        currentPosition: LatLng(pos.latitude, pos.longitude),
+      );
+    });
+  }
+
   Future<void> startRide() async {
+    _bgLocationSub?.cancel();
+    _bgLocationSub = null;
+
     final gps = ref.read(gpsServiceProvider);
     final granted = await gps.requestPermission();
     if (!granted) {
@@ -58,6 +80,7 @@ class ActivityNotifier extends Notifier<ActivityState> {
     _ticker?.cancel();
     _ticker = null;
     state = const ActivityState();
+    initLocation();
   }
 
   void _onPosition(Position pos) {
