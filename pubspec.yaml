@@ -1,0 +1,30 @@
+name: gamma
+description: Bike Tracker — Android cycling tracker app
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.3
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.8.1
+  sqflite: ^2.4.2
+  flutter_map: ^8.1.1
+  latlong2: ^0.9.1
+  geolocator: ^13.0.4
+  fl_chart: ^0.71.0
+  gap: ^3.0.1
+  path_provider: ^2.1.5
+  path: ^1.9.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  mocktail: ^1.0.4
+
+flutter:
+  uses-material-design: true
