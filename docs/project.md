@@ -60,6 +60,7 @@ Four cards arranged in a 2×2 grid:
 | Speed    | Current speed            | km/h    |
 | Distance | Total distance this ride | km      |
 | Time     | Elapsed time             | min / h |
+| Altitude | Current GPS altitude     | m       |
 
 The **Speed** card is highlighted in green when the rider is moving.
 
