@@ -116,9 +116,9 @@ class _SectionHeader extends StatelessWidget {
                 ],
               ),
             ),
-            // Total duration — 52 px
+            // Total duration — 72 px
             SizedBox(
-              width: 52,
+              width: 72,
               child: Text(
                 RideFormatters.duration(totalDuration),
                 textAlign: TextAlign.right,
@@ -131,9 +131,9 @@ class _SectionHeader extends StatelessWidget {
             ),
             // Gap — 20 px
             const Gap(20),
-            // Total distance — 52 px
+            // Total distance — 84 px
             SizedBox(
-              width: 52,
+              width: 84,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 crossAxisAlignment: CrossAxisAlignment.baseline,

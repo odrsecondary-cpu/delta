@@ -39,7 +39,7 @@ class TotalBar extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: 52,
+            width: 72,
             child: Text(
               RideFormatters.duration(_totalDuration),
               textAlign: TextAlign.right,
@@ -52,7 +52,7 @@ class TotalBar extends StatelessWidget {
           ),
           const Gap(20),
           SizedBox(
-            width: 52,
+            width: 84,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.baseline,

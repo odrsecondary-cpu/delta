@@ -64,9 +64,9 @@ class _RowContent extends StatelessWidget {
             ],
           ),
         ),
-        // Duration — 52 px
+        // Duration — 72 px
         SizedBox(
-          width: 52,
+          width: 72,
           child: Text(
             RideFormatters.duration(ride.duration),
             textAlign: TextAlign.right,
@@ -78,9 +78,9 @@ class _RowContent extends StatelessWidget {
         ),
         // Gap — 20 px
         const Gap(20),
-        // Distance — 52 px
+        // Distance — 84 px
         SizedBox(
-          width: 52,
+          width: 84,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.baseline,
