@@ -19,6 +19,7 @@ class RideControls extends ConsumerWidget {
     final notifier = ref.read(activityProvider.notifier);
 
     return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Expanded(
           child: _PrimaryButton(status: status, notifier: notifier),
@@ -58,12 +59,12 @@ class _PrimaryButton extends StatelessWidget {
     }
 
     return SizedBox(
-      height: 52,
+      height: 72,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.green,
-          foregroundColor: Colors.black,
+          backgroundColor: const Color(0xFF1E1E1E),
+          foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -90,12 +91,12 @@ class _StopButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 52,
-      height: 52,
+      width: 72,
+      height: 72,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFFB71C1C),
+          backgroundColor: const Color(0xFF3A1212),
           foregroundColor: Colors.white,
           elevation: 0,
           padding: EdgeInsets.zero,
@@ -103,7 +104,14 @@ class _StopButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(20),
           ),
         ),
-        child: const Icon(Icons.stop_rounded, size: 26),
+        child: Container(
+          width: 22,
+          height: 22,
+          decoration: BoxDecoration(
+            color: const Color(0xFFFF5C5C),
+            borderRadius: BorderRadius.circular(5),
+          ),
+        ),
       ),
     );
   }
