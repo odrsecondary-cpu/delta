@@ -36,7 +36,7 @@ class ElevationChartPanel extends StatelessWidget {
             height: 110,
             decoration: BoxDecoration(
               color: AppColors.surface,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.surfaceBorder, width: 0.5),
             ),
             padding: const EdgeInsets.fromLTRB(12, 12, 12, 8),

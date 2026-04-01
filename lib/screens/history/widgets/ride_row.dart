@@ -24,7 +24,7 @@ class RideRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
           border: Border.all(color: AppColors.surfaceBorder, width: 0.5),
         ),
         child: _RowContent(ride: ride),

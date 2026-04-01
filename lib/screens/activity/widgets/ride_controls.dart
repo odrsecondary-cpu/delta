@@ -66,7 +66,7 @@ class _PrimaryButton extends StatelessWidget {
           foregroundColor: Colors.black,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
         child: Text(
@@ -100,7 +100,7 @@ class _StopButton extends StatelessWidget {
           elevation: 0,
           padding: EdgeInsets.zero,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
         child: const Icon(Icons.stop_rounded, size: 26),

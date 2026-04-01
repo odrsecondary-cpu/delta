@@ -40,7 +40,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(20),
                   child: const MapPanel(),
                 ),
               ),
@@ -130,7 +130,7 @@ class _PermissionBanner extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.redAccent.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: Colors.redAccent.withValues(alpha: 0.4),
           width: 0.5,

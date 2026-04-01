@@ -15,7 +15,7 @@ class DetailMapPanel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(20),
         child: SizedBox(
           height: 160,
           child: trackPoints.isEmpty
