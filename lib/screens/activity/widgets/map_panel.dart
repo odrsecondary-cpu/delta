@@ -63,7 +63,7 @@ class _MapPanelState extends ConsumerState<MapPanel> {
               PolylineLayer(
                 polylines: [
                   Polyline(
-                    points: actState.trackPoints,
+                    points: actState.positions,
                     color: AppColors.green,
                     strokeWidth: 3,
                   ),

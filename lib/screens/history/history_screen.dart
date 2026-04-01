@@ -1,18 +1,170 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
-class HistoryScreen extends StatelessWidget {
+import '../../core/theme/app_theme.dart';
+import '../../models/ride.dart';
+import 'history_notifier.dart';
+import 'widgets/month_section.dart';
+import 'widgets/total_bar.dart';
+
+// ── Month grouping ────────────────────────────────────────────────────────────
+
+extension _RideGrouping on List<Ride> {
+  List<({DateTime month, List<Ride> rides})> groupByMonth() {
+    final groups = <DateTime, List<Ride>>{};
+    for (final ride in this) {
+      final key = DateTime(ride.startTime.year, ride.startTime.month);
+      (groups[key] ??= []).add(ride);
+    }
+    final keys = groups.keys.toList()..sort((a, b) => b.compareTo(a));
+    return keys.map((k) => (month: k, rides: groups[k]!)).toList();
+  }
+}
+
+String _monthKey(DateTime dt) => '${dt.year}-${dt.month}';
+
+// ── Screen ────────────────────────────────────────────────────────────────────
+
+class HistoryScreen extends ConsumerStatefulWidget {
   const HistoryScreen({super.key});
 
   @override
+  ConsumerState<HistoryScreen> createState() => _HistoryScreenState();
+}
+
+class _HistoryScreenState extends ConsumerState<HistoryScreen> {
+  final Set<String> _collapsed = {};
+
+  void _toggleSection(DateTime month) {
+    setState(() {
+      final key = _monthKey(month);
+      if (_collapsed.contains(key)) {
+        _collapsed.remove(key);
+      } else {
+        _collapsed.add(key);
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final ridesAsync = ref.watch(historyProvider);
+
+    return Scaffold(
       backgroundColor: AppColors.background,
-      body: Center(
-        child: Text(
-          'History',
-          style: TextStyle(color: AppColors.whiteMuted, fontSize: 16),
+      body: ridesAsync.when(
+        loading: () => const Center(
+          child: CircularProgressIndicator(color: AppColors.green),
         ),
+        error: (_, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Could not load rides',
+                style: TextStyle(color: AppColors.whiteMuted),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () => ref.invalidate(historyProvider),
+                child: const Text(
+                  'Retry',
+                  style: TextStyle(color: AppColors.green),
+                ),
+              ),
+            ],
+          ),
+        ),
+        data: (rides) => rides.isEmpty
+            ? const _EmptyState()
+            : _RideList(
+                rides: rides,
+                collapsed: _collapsed,
+                onToggle: _toggleSection,
+                onRideTap: (ride) => context.push('/history/${ride.id}'),
+              ),
+      ),
+    );
+  }
+}
+
+// ── List + pinned total bar ───────────────────────────────────────────────────
+
+class _RideList extends StatelessWidget {
+  const _RideList({
+    required this.rides,
+    required this.collapsed,
+    required this.onToggle,
+    required this.onRideTap,
+  });
+
+  final List<Ride> rides;
+  final Set<String> collapsed;
+  final ValueChanged<DateTime> onToggle;
+  final ValueChanged<Ride> onRideTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final groups = rides.groupByMonth();
+    final topPad = MediaQuery.of(context).padding.top;
+
+    return Column(
+      children: [
+        Expanded(
+          child: ListView.builder(
+            padding: EdgeInsets.fromLTRB(16, topPad + 8, 16, 8),
+            itemCount: groups.length,
+            itemBuilder: (_, i) {
+              final group = groups[i];
+              return MonthSection(
+                key: ValueKey(_monthKey(group.month)),
+                month: group.month,
+                rides: group.rides,
+                isCollapsed: collapsed.contains(_monthKey(group.month)),
+                onToggle: () => onToggle(group.month),
+                onRideTap: onRideTap,
+              );
+            },
+          ),
+        ),
+        TotalBar(rides: rides),
+      ],
+    );
+  }
+}
+
+// ── Empty state ───────────────────────────────────────────────────────────────
+
+class _EmptyState extends StatelessWidget {
+  const _EmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.directions_bike_outlined,
+            size: 48,
+            color: AppColors.whiteDim,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'No rides yet',
+            style: TextStyle(
+              color: AppColors.whiteMuted,
+              fontSize: 16,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            'Start a ride from the Activity screen',
+            style: TextStyle(color: AppColors.whiteDim, fontSize: 13),
+          ),
+        ],
       ),
     );
   }

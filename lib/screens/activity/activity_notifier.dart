@@ -4,6 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../models/ride.dart';
+import '../../models/track_point.dart';
+import '../../services/database_service.dart';
 import '../../services/gps_service.dart';
 import 'activity_state.dart';
 
@@ -53,6 +56,7 @@ class ActivityNotifier extends Notifier<ActivityState> {
     }
     state = state.copyWith(
       status: RideStatus.active,
+      startTime: DateTime.now(),
       permissionDenied: false,
     );
     _startTicker();
@@ -72,9 +76,31 @@ class ActivityNotifier extends Notifier<ActivityState> {
     state = state.copyWith(status: RideStatus.active);
   }
 
-  /// Ends the ride and resets state. Caller is responsible for persisting
-  /// the ride to the database before invoking this.
-  void stopRide() {
+  /// Saves the completed ride to the database, then resets state.
+  Future<void> saveAndStop() async {
+    final s = state;
+    final now = DateTime.now();
+    final start = s.startTime ?? now;
+    final movingTime = s.elapsed;
+    final totalDuration = now.difference(start);
+    final avgSpeed = movingTime.inSeconds > 0
+        ? s.distanceKm / (movingTime.inSeconds / 3600.0)
+        : 0.0;
+
+    final ride = Ride(
+      name: _autoName(start),
+      startTime: start,
+      totalDistance: s.distanceKm,
+      avgSpeed: avgSpeed,
+      maxSpeed: s.maxSpeedKmh,
+      duration: totalDuration,
+      movingTime: movingTime,
+      elevationGain: s.elevationGain,
+      trackPoints: s.trackPoints,
+    );
+
+    await ref.read(databaseServiceProvider).insertRide(ride);
+
     _gpsSub?.cancel();
     _gpsSub = null;
     _ticker?.cancel();
@@ -83,23 +109,44 @@ class ActivityNotifier extends Notifier<ActivityState> {
     initLocation();
   }
 
+  static String _autoName(DateTime t) {
+    final h = t.hour;
+    if (h < 12) return 'Morning Ride';
+    if (h < 17) return 'Afternoon Ride';
+    return 'Evening Ride';
+  }
+
   void _onPosition(Position pos) {
-    final newPoint = LatLng(pos.latitude, pos.longitude);
-    final updatedPoints = [...state.trackPoints, newPoint];
+    final newLatLng = LatLng(pos.latitude, pos.longitude);
+    final speedKmh = pos.speed * 3.6; // m/s → km/h
 
     double addedKm = 0;
     if (state.trackPoints.isNotEmpty) {
-      // Distance.call returns meters
       addedKm =
-          _distanceCalc(state.trackPoints.last, newPoint) / 1000.0;
+          _distanceCalc(state.trackPoints.last.position, newLatLng) / 1000.0;
     }
 
+    double addedGain = 0;
+    if (state.trackPoints.isNotEmpty) {
+      final diff = pos.altitude - state.altitudeM;
+      if (diff > 0) addedGain = diff;
+    }
+
+    final newPoint = TrackPoint(
+      position: newLatLng,
+      speed: speedKmh,
+      altitude: pos.altitude,
+      timestamp: DateTime.now(),
+    );
+
     state = state.copyWith(
-      speedKmh: pos.speed * 3.6, // m/s → km/h
+      speedKmh: speedKmh,
+      maxSpeedKmh: speedKmh > state.maxSpeedKmh ? speedKmh : state.maxSpeedKmh,
       distanceKm: state.distanceKm + addedKm,
       altitudeM: pos.altitude,
-      trackPoints: updatedPoints,
-      currentPosition: newPoint,
+      elevationGain: state.elevationGain + addedGain,
+      trackPoints: [...state.trackPoints, newPoint],
+      currentPosition: newLatLng,
     );
   }
 

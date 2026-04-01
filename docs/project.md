@@ -16,7 +16,7 @@ The app focuses on three core experiences: live ride tracking, browsing past rid
 - Screen 1 — Activity
   Live tracking screen. Shows a mini map with the current route trace, four real-time metrics (speed, distance, time), a pause button, and a stop button. A green "LIVE" badge indicates an active session.
 - Screen 2.1 — History
-  List of past rides filtered by month. Each entry shows a ride name, date/time, distance, average speed, and duration.
+  List of past rides grouped by month. Each entry shows a date, duration, and distance.
 - Screen 2.2 — History Details
   Each entry shows the ride details.
 - Screen 3 — Statistics

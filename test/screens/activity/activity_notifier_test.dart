@@ -3,11 +3,17 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mocktail/mocktail.dart';
 
+import 'package:gamma/models/ride.dart';
 import 'package:gamma/screens/activity/activity_notifier.dart';
 import 'package:gamma/screens/activity/activity_state.dart';
+import 'package:gamma/services/database_service.dart';
 import 'package:gamma/services/gps_service.dart';
 
 class MockGpsService extends Mock implements GpsService {}
+
+class MockDatabaseService extends Mock implements DatabaseService {}
+
+class FakeRide extends Fake implements Ride {}
 
 // Convenience wrapper so tests can read the current state without re-watching.
 extension on ProviderContainer {
@@ -16,13 +22,20 @@ extension on ProviderContainer {
 }
 
 void main() {
+  setUpAll(() => registerFallbackValue(FakeRide()));
+
   late MockGpsService mockGps;
+  late MockDatabaseService mockDb;
   late ProviderContainer container;
 
   setUp(() {
     mockGps = MockGpsService();
+    mockDb = MockDatabaseService();
     container = ProviderContainer(
-      overrides: [gpsServiceProvider.overrideWithValue(mockGps)],
+      overrides: [
+        gpsServiceProvider.overrideWithValue(mockGps),
+        databaseServiceProvider.overrideWithValue(mockDb),
+      ],
     );
   });
 
@@ -83,20 +96,22 @@ void main() {
     });
   });
 
-  group('stopRide', () {
-    test('should reset to idle with zeroed metrics', () async {
+  group('saveAndStop', () {
+    test('should save ride and reset to idle with zeroed metrics', () async {
       when(() => mockGps.requestPermission()).thenAnswer((_) async => true);
       when(() => mockGps.positionStream())
           .thenAnswer((_) => const Stream.empty());
+      when(() => mockDb.insertRide(any())).thenAnswer((_) async => 1);
 
       await container.activityNotifier.startRide();
-      container.activityNotifier.stopRide();
+      await container.activityNotifier.saveAndStop();
 
       final state = container.activity;
       expect(state.status, RideStatus.idle);
       expect(state.distanceKm, 0.0);
       expect(state.elapsed, Duration.zero);
       expect(state.trackPoints, isEmpty);
+      verify(() => mockDb.insertRide(any())).called(1);
     });
   });
 

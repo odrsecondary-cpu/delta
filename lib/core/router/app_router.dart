@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../screens/activity/activity_screen.dart';
 import '../../screens/history/history_screen.dart';
+import '../../screens/history_detail/history_detail_screen.dart';
 import '../../screens/statistics/statistics_screen.dart';
 import '../../widgets/app_shell.dart';
 
@@ -25,6 +26,15 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/history',
                 builder: (context, _) => const HistoryScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    builder: (context, state) {
+                      final id = int.parse(state.pathParameters['id']!);
+                      return HistoryDetailScreen(rideId: id);
+                    },
+                  ),
+                ],
               ),
             ],
           ),

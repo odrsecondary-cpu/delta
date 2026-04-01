@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../history/history_notifier.dart';
 import 'activity_notifier.dart';
 import 'activity_state.dart';
 import 'widgets/live_badge.dart';
@@ -85,7 +86,8 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
       ),
     );
     if (confirmed == true) {
-      ref.read(activityProvider.notifier).stopRide();
+      await ref.read(activityProvider.notifier).saveAndStop();
+      ref.invalidate(historyProvider);
     }
   }
 }
