@@ -165,7 +165,8 @@ class _MetricsGrid extends StatelessWidget {
             label: 'Speed',
             value: actState.speedKmh.toStringAsFixed(1),
             unit: 'km/h',
-            highlighted: actState.isMoving,
+            highlighted: actState.isMoving || actState.status == RideStatus.paused,
+            accentColor: actState.status == RideStatus.paused ? AppColors.orange : AppColors.green,
           ),
           MetricCard(
             label: 'Distance',

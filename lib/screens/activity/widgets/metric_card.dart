@@ -9,24 +9,29 @@ class MetricCard extends StatelessWidget {
     required this.value,
     required this.unit,
     this.highlighted = false,
+    this.accentColor,
   });
 
   final String label;
   final String value;
   final String unit;
 
-  /// When true, the card uses a green tint — used for Speed when moving.
+  /// When true, the card uses a tinted highlight — used for Speed when moving.
   final bool highlighted;
+
+  /// Overrides the highlight color (defaults to [AppColors.green]).
+  final Color? accentColor;
 
   @override
   Widget build(BuildContext context) {
+    final accent = accentColor ?? AppColors.green;
     final bg = highlighted
-        ? AppColors.green.withValues(alpha: 0.12)
+        ? accent.withValues(alpha: 0.12)
         : AppColors.surface;
     final borderColor = highlighted
-        ? AppColors.green.withValues(alpha: 0.35)
+        ? accent.withValues(alpha: 0.35)
         : AppColors.surfaceBorder;
-    final valueColor = highlighted ? AppColors.green : AppColors.white;
+    final valueColor = highlighted ? accent : AppColors.white;
 
     return Container(
       decoration: BoxDecoration(

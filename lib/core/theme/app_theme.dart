@@ -6,6 +6,7 @@ abstract final class AppColors {
   static const surface = Color(0xFF161A23);
   static const surfaceBorder = Color(0xFF2A2F3A);
   static const green = Color(0xFF34D367);
+  static const orange = Color(0xFFFF8C35);
   // History screen accent — brighter green used for section headers and total bar
   static const greenBright = Color(0xFF1AFF8C);
   static const greenBrightMuted = Color(0x331AFF8C); // 20 % opacity

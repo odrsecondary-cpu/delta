@@ -65,8 +65,8 @@ class _PrimaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: status == RideStatus.active
               ? const Color(0xFF3A2412)
-              : const Color(0xFF1E1E1E),
-          foregroundColor: Colors.white,
+              : AppColors.green.withValues(alpha: 0.12),
+          foregroundColor: status == RideStatus.idle ? AppColors.green : Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
