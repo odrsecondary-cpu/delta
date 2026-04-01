@@ -17,6 +17,7 @@ dependencies:
   geolocator: ^13.0.4
   fl_chart: ^0.71.0
   gap: ^3.0.1
+  google_fonts: ^6.2.1
   path_provider: ^2.1.5
   path: ^1.9.1
 

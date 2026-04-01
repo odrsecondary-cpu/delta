@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 abstract final class AppColors {
   static const background = Color(0xFF0F0F0F);
@@ -18,6 +19,9 @@ final appTheme = ThemeData(
   useMaterial3: true,
   brightness: Brightness.dark,
   scaffoldBackgroundColor: AppColors.background,
+  textTheme: GoogleFonts.interTextTheme(
+    ThemeData.dark().textTheme,
+  ),
   colorScheme: const ColorScheme.dark(
     surface: AppColors.surface,
     primary: AppColors.green,
@@ -27,9 +31,9 @@ final appTheme = ThemeData(
     backgroundColor: AppColors.surface,
     titleTextStyle: TextStyle(
       color: AppColors.white,
-      fontSize: 18,
+      fontSize: 24,
       fontWeight: FontWeight.w600,
     ),
-    contentTextStyle: TextStyle(color: AppColors.whiteMuted, fontSize: 14),
+    contentTextStyle: TextStyle(color: AppColors.whiteMuted, fontSize: 20),
   ),
 );

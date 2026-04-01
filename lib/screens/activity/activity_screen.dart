@@ -108,7 +108,7 @@ class _ActivityHeader extends StatelessWidget {
             'Activity',
             style: TextStyle(
               color: AppColors.white,
-              fontSize: 20,
+              fontSize: 28,
               fontWeight: FontWeight.w600,
             ),
           ),

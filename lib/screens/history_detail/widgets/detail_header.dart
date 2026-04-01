@@ -32,7 +32,7 @@ class DetailHeader extends ConsumerWidget {
                   RideFormatters.longDate(ride.startTime),
                   style: const TextStyle(
                     color: AppColors.white,
-                    fontSize: 14,
+                    fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
@@ -40,7 +40,7 @@ class DetailHeader extends ConsumerWidget {
                   'Started at ${RideFormatters.time12h(ride.startTime)}',
                   style: const TextStyle(
                     color: AppColors.whiteMuted,
-                    fontSize: 11,
+                    fontSize: 16,
                   ),
                 ),
               ],

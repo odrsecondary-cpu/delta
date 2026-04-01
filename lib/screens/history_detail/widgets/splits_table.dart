@@ -24,7 +24,7 @@ class SplitsTable extends StatelessWidget {
             'SPLITS',
             style: TextStyle(
               color: AppColors.whiteDim,
-              fontSize: 10,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.5,
             ),
@@ -69,7 +69,7 @@ class _SplitRow extends StatelessWidget {
             width: 36,
             child: Text(
               '${split.km} km',
-              style: const TextStyle(color: AppColors.whiteMuted, fontSize: 11),
+              style: const TextStyle(color: AppColors.whiteMuted, fontSize: 16),
             ),
           ),
           const Gap(8),
@@ -98,7 +98,7 @@ class _SplitRow extends StatelessWidget {
           // Pace
           Text(
             split.paceLabel,
-            style: const TextStyle(color: AppColors.whiteMuted, fontSize: 11),
+            style: const TextStyle(color: AppColors.whiteMuted, fontSize: 16),
           ),
           const Gap(10),
           // Speed
@@ -109,7 +109,7 @@ class _SplitRow extends StatelessWidget {
               textAlign: TextAlign.right,
               style: const TextStyle(
                 color: AppColors.white,
-                fontSize: 11,
+                fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
             ),

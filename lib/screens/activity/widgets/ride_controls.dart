@@ -73,7 +73,7 @@ class _PrimaryButton extends StatelessWidget {
           label,
           style: const TextStyle(
             fontWeight: FontWeight.w700,
-            fontSize: 16,
+            fontSize: 22,
             letterSpacing: 0.3,
           ),
         ),

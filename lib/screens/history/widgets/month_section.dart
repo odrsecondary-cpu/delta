@@ -89,7 +89,7 @@ class _SectionHeader extends StatelessWidget {
                         RideFormatters.monthName(month),
                         style: const TextStyle(
                           color: AppColors.greenBright,
-                          fontSize: 12,
+                          fontSize: 18,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -97,7 +97,7 @@ class _SectionHeader extends StatelessWidget {
                         RideFormatters.year(month),
                         style: TextStyle(
                           color: AppColors.greenBright.withValues(alpha: 0.5),
-                          fontSize: 10,
+                          fontSize: 15,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -124,7 +124,7 @@ class _SectionHeader extends StatelessWidget {
                 textAlign: TextAlign.right,
                 style: const TextStyle(
                   color: AppColors.whiteMuted,
-                  fontSize: 12,
+                  fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -143,7 +143,7 @@ class _SectionHeader extends StatelessWidget {
                     RideFormatters.distanceValue(totalDistance),
                     style: const TextStyle(
                       color: AppColors.whiteMuted,
-                      fontSize: 12,
+                      fontSize: 18,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -152,7 +152,7 @@ class _SectionHeader extends StatelessWidget {
                     'km',
                     style: TextStyle(
                       color: AppColors.whiteMuted.withValues(alpha: 0.6),
-                      fontSize: 11,
+                      fontSize: 16,
                     ),
                   ),
                 ],

@@ -155,14 +155,14 @@ class _EmptyState extends StatelessWidget {
             'No rides yet',
             style: TextStyle(
               color: AppColors.whiteMuted,
-              fontSize: 16,
+              fontSize: 22,
               fontWeight: FontWeight.w500,
             ),
           ),
           SizedBox(height: 6),
           Text(
             'Start a ride from the Activity screen',
-            style: TextStyle(color: AppColors.whiteDim, fontSize: 13),
+            style: TextStyle(color: AppColors.whiteDim, fontSize: 18),
           ),
         ],
       ),

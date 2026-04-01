@@ -43,7 +43,7 @@ class MetricCard extends StatelessWidget {
             label.toUpperCase(),
             style: const TextStyle(
               color: AppColors.whiteMuted,
-              fontSize: 10,
+              fontSize: 15,
               letterSpacing: 1.1,
             ),
           ),
@@ -54,7 +54,7 @@ class MetricCard extends StatelessWidget {
                 value,
                 style: TextStyle(
                   color: valueColor,
-                  fontSize: 26,
+                  fontSize: 36,
                   fontWeight: FontWeight.w600,
                   height: 1,
                 ),
@@ -67,7 +67,7 @@ class MetricCard extends StatelessWidget {
                     unit,
                     style: const TextStyle(
                       color: AppColors.whiteMuted,
-                      fontSize: 11,
+                      fontSize: 16,
                     ),
                   ),
                 ),

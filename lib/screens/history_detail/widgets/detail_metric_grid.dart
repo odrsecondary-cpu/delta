@@ -114,7 +114,7 @@ class _MetricCard extends StatelessWidget {
             label,
             style: TextStyle(
               color: labelColor,
-              fontSize: 10,
+              fontSize: 15,
               fontWeight: FontWeight.w500,
               letterSpacing: 0.5,
             ),
@@ -129,7 +129,7 @@ class _MetricCard extends StatelessWidget {
                   value,
                   style: TextStyle(
                     color: valueColor,
-                    fontSize: 18,
+                    fontSize: 26,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -138,7 +138,7 @@ class _MetricCard extends StatelessWidget {
                 const SizedBox(width: 3),
                 Text(
                   unit,
-                  style: TextStyle(color: unitColor, fontSize: 11),
+                  style: TextStyle(color: unitColor, fontSize: 16),
                 ),
               ],
             ],

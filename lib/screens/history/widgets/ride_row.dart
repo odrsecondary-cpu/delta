@@ -50,7 +50,7 @@ class _RowContent extends StatelessWidget {
                 RideFormatters.shortDate(ride.startTime),
                 style: const TextStyle(
                   color: AppColors.whiteMuted,
-                  fontSize: 12,
+                  fontSize: 18,
                 ),
               ),
               const SizedBox(width: 6),
@@ -58,7 +58,7 @@ class _RowContent extends StatelessWidget {
                 RideFormatters.time12h(ride.startTime),
                 style: const TextStyle(
                   color: AppColors.whiteDim,
-                  fontSize: 10,
+                  fontSize: 15,
                 ),
               ),
             ],
@@ -72,7 +72,7 @@ class _RowContent extends StatelessWidget {
             textAlign: TextAlign.right,
             style: const TextStyle(
               color: AppColors.whiteDim,
-              fontSize: 12,
+              fontSize: 18,
             ),
           ),
         ),
@@ -90,7 +90,7 @@ class _RowContent extends StatelessWidget {
                 RideFormatters.distanceValue(ride.totalDistance),
                 style: const TextStyle(
                   color: AppColors.white,
-                  fontSize: 12,
+                  fontSize: 18,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -99,7 +99,7 @@ class _RowContent extends StatelessWidget {
                 'km',
                 style: TextStyle(
                   color: AppColors.whiteMuted,
-                  fontSize: 11,
+                  fontSize: 16,
                 ),
               ),
             ],

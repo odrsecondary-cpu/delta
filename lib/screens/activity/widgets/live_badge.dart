@@ -56,7 +56,7 @@ class _LiveBadgeState extends State<LiveBadge>
           'LIVE',
           style: TextStyle(
             color: AppColors.green,
-            fontSize: 11,
+            fontSize: 16,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.2,
           ),
@@ -66,7 +66,7 @@ class _LiveBadgeState extends State<LiveBadge>
           _formatElapsed(widget.elapsed),
           style: const TextStyle(
             color: AppColors.whiteMuted,
-            fontSize: 11,
+            fontSize: 16,
           ),
         ),
       ],
