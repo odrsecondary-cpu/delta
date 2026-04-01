@@ -46,38 +46,48 @@ class MetricCard extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: AppColors.whiteMuted,
               fontSize: 18,
               letterSpacing: 1.1,
             ),
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                value,
-                style: TextStyle(
-                  color: valueColor,
-                  fontSize: 36,
-                  fontWeight: FontWeight.w600,
-                  height: 1,
-                ),
-              ),
-              if (unit.isNotEmpty) ...[
-                const SizedBox(width: 4),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 3),
-                  child: Text(
-                    unit,
-                    style: const TextStyle(
-                      color: AppColors.whiteMuted,
-                      fontSize: 16,
+          Align(
+            alignment: Alignment.bottomLeft,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.bottomLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    value,
+                    style: TextStyle(
+                      color: valueColor,
+                      fontSize: 36,
+                      fontWeight: FontWeight.w600,
+                      height: 1,
                     ),
                   ),
-                ),
-              ],
-            ],
+                  if (unit.isNotEmpty) ...[
+                    const SizedBox(width: 4),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 3),
+                      child: Text(
+                        unit,
+                        style: const TextStyle(
+                          color: AppColors.whiteMuted,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
           ),
         ],
       ),
