@@ -9,14 +9,11 @@ abstract final class RideFormatters {
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
   ];
 
-  /// "32 min" or "1:01 h"
+  /// "0:50 h" or "1:01 h"
   static String duration(Duration d) {
-    if (d.inHours >= 1) {
-      final h = d.inHours;
-      final m = d.inMinutes.remainder(60);
-      return '$h:${m.toString().padLeft(2, '0')} h';
-    }
-    return '${d.inMinutes} min';
+    final h = d.inHours;
+    final m = d.inMinutes.remainder(60);
+    return '$h:${m.toString().padLeft(2, '0')} h';
   }
 
   /// "5.2" — caller renders the "km" unit label separately
