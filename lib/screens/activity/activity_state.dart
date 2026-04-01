@@ -15,6 +15,7 @@ class ActivityState {
     this.altitudeM = 0.0,
     this.elevationGain = 0.0,
     this.trackPoints = const [],
+    this.routeSegments = const [],
     this.currentPosition,
     this.permissionDenied = false,
   });
@@ -28,10 +29,10 @@ class ActivityState {
   final double altitudeM;
   final double elevationGain;
   final List<TrackPoint> trackPoints;
+  /// Separate polyline segments — a new segment starts after each resume.
+  final List<List<LatLng>> routeSegments;
   final LatLng? currentPosition;
   final bool permissionDenied;
-
-  List<LatLng> get positions => trackPoints.map((tp) => tp.position).toList();
 
   bool get isMoving => speedKmh > 0.5;
   bool get isActive => status == RideStatus.active;
@@ -48,6 +49,7 @@ class ActivityState {
     double? altitudeM,
     double? elevationGain,
     List<TrackPoint>? trackPoints,
+    List<List<LatLng>>? routeSegments,
     LatLng? currentPosition,
     bool? permissionDenied,
   }) {
@@ -61,6 +63,7 @@ class ActivityState {
       altitudeM: altitudeM ?? this.altitudeM,
       elevationGain: elevationGain ?? this.elevationGain,
       trackPoints: trackPoints ?? this.trackPoints,
+      routeSegments: routeSegments ?? this.routeSegments,
       currentPosition: currentPosition ?? this.currentPosition,
       permissionDenied: permissionDenied ?? this.permissionDenied,
     );

@@ -14,6 +14,9 @@ class ActivityNotifier extends Notifier<ActivityState> {
   StreamSubscription<Position>? _bgLocationSub;
   StreamSubscription<Position>? _gpsSub;
   Timer? _ticker;
+  // Skip distance accumulation for the first point after resume (rider may
+  // have moved during the pause).
+  bool _justResumed = false;
 
   static const _distanceCalc = Distance();
 
@@ -64,14 +67,14 @@ class ActivityNotifier extends Notifier<ActivityState> {
   }
 
   void pauseRide() {
-    _gpsSub?.pause();
+    // Keep GPS stream running so the marker keeps moving on the map.
     _ticker?.cancel();
     _ticker = null;
     state = state.copyWith(status: RideStatus.paused);
   }
 
   void resumeRide() {
-    _gpsSub?.resume();
+    _justResumed = true;
     _startTicker();
     state = state.copyWith(status: RideStatus.active);
   }
@@ -120,14 +123,41 @@ class ActivityNotifier extends Notifier<ActivityState> {
     final newLatLng = LatLng(pos.latitude, pos.longitude);
     final speedKmh = pos.speed * 3.6; // m/s → km/h
 
+    if (state.status == RideStatus.paused) {
+      // During pause: move the marker but don't record anything.
+      state = state.copyWith(
+        currentPosition: newLatLng,
+        altitudeM: pos.altitude,
+        speedKmh: speedKmh,
+      );
+      return;
+    }
+
+    // --- Active: record stats and extend the route ---
+
+    final isFirstPoint = state.trackPoints.isEmpty;
+    final skipDistance = isFirstPoint || _justResumed;
+
+    // Build route segments. A new segment begins at ride start and after
+    // each resume so the polyline doesn't bridge the pause gap.
+    final segments = state.routeSegments;
+    final List<List<LatLng>> newSegments;
+    if (segments.isEmpty || _justResumed) {
+      newSegments = [...segments, [newLatLng]];
+    } else {
+      final updatedLast = [...segments.last, newLatLng];
+      newSegments = [...segments.sublist(0, segments.length - 1), updatedLast];
+    }
+    _justResumed = false;
+
     double addedKm = 0;
-    if (state.trackPoints.isNotEmpty) {
+    if (!skipDistance) {
       addedKm =
           _distanceCalc(state.trackPoints.last.position, newLatLng) / 1000.0;
     }
 
     double addedGain = 0;
-    if (state.trackPoints.isNotEmpty) {
+    if (!isFirstPoint) {
       final diff = pos.altitude - state.altitudeM;
       if (diff > 0) addedGain = diff;
     }
@@ -146,6 +176,7 @@ class ActivityNotifier extends Notifier<ActivityState> {
       altitudeM: pos.altitude,
       elevationGain: state.elevationGain + addedGain,
       trackPoints: [...state.trackPoints, newPoint],
+      routeSegments: newSegments,
       currentPosition: newLatLng,
     );
   }

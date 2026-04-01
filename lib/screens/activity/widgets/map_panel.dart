@@ -59,14 +59,16 @@ class _MapPanelState extends ConsumerState<MapPanel> {
               subdomains: const ['a', 'b', 'c', 'd'],
               userAgentPackageName: 'com.example.gamma',
             ),
-            if (actState.trackPoints.length >= 2)
+            if (actState.routeSegments.isNotEmpty)
               PolylineLayer(
                 polylines: [
-                  Polyline(
-                    points: actState.positions,
-                    color: AppColors.green,
-                    strokeWidth: 3,
-                  ),
+                  for (final seg in actState.routeSegments)
+                    if (seg.length >= 2)
+                      Polyline(
+                        points: seg,
+                        color: AppColors.green,
+                        strokeWidth: 3,
+                      ),
                 ],
               ),
             if (actState.currentPosition != null)
