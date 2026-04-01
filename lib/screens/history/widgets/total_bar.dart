@@ -50,7 +50,7 @@ class TotalBar extends StatelessWidget {
               ),
             ),
           ),
-          const Gap(8),
+          const Gap(20),
           SizedBox(
             width: 52,
             child: Row(

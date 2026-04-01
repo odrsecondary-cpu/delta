@@ -76,8 +76,8 @@ class _RowContent extends StatelessWidget {
             ),
           ),
         ),
-        // Gap — 8 px
-        const Gap(8),
+        // Gap — 20 px
+        const Gap(20),
         // Distance — 52 px
         SizedBox(
           width: 52,
