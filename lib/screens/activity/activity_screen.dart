@@ -45,12 +45,12 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             if (actState.permissionDenied)
               const _PermissionBanner(),
             _MetricsGrid(actState: actState),
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
               child: RideControls(
                 onStopRequested: () => _confirmStop(context),
               ),
@@ -155,8 +155,8 @@ class _MetricsGrid extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
       child: GridView.count(
         crossAxisCount: 2,
-        crossAxisSpacing: 10,
-        mainAxisSpacing: 10,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
         childAspectRatio: 1.7,
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),

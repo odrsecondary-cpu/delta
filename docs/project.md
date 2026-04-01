@@ -39,7 +39,7 @@ A persistent bottom tab bar provides access to all three main screens. The activ
 
 > Ride tracking screen. Shows current location on the map immediately on open, even before a ride starts.
 
-![Activity screen](screen-activity.svg)
+![Activity screen](screen-activity.png)
 
 ### Header
 
@@ -76,7 +76,7 @@ The **Speed** card is highlighted in green when the rider is moving.
 
 > Chronological list of completed rides, filterable by month.
 
-![History screen](screen-history.svg)
+![History screen](screen-history.png)
 
 ## Screen: History
 
@@ -178,7 +178,7 @@ A secondary screen accessible by tapping any ride in the list:
 
 > Accessed by tapping any ride row in the History screen.
 
-![History details screen](screen-history-details.svg)
+![History details screen](screen-history-details.png)
 
 ---
 
@@ -257,7 +257,7 @@ History navigation stack.
 
 > Aggregated performance data for a selected time period.
 
-![Statistics screen](screen-statistics.svg)
+![Statistics screen](screen-statistics.png)
 
 ### Period Selector
 
