@@ -30,12 +30,11 @@ abstract final class RideFormatters {
   static String longDate(DateTime dt) =>
       '${dt.day} ${_months[dt.month - 1]} ${dt.year}';
 
-  /// "9:30 AM"
+  /// "23:30"
   static String time12h(DateTime dt) {
-    final h = dt.hour % 12 == 0 ? 12 : dt.hour % 12;
+    final h = dt.hour.toString().padLeft(2, '0');
     final m = dt.minute.toString().padLeft(2, '0');
-    final period = dt.hour >= 12 ? 'PM' : 'AM';
-    return '$h:$m $period';
+    return '$h:$m';
   }
 
   /// "March"
