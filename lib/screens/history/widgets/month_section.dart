@@ -82,26 +82,22 @@ class _SectionHeader extends StatelessWidget {
             Expanded(
               child: Row(
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        RideFormatters.monthName(month),
-                        style: const TextStyle(
-                          color: AppColors.greenBright,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      Text(
-                        RideFormatters.year(month),
-                        style: TextStyle(
-                          color: AppColors.greenBright.withValues(alpha: 0.5),
-                          fontSize: 15,
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    RideFormatters.monthName(month),
+                    style: const TextStyle(
+                      color: AppColors.greenBright,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    RideFormatters.year(month),
+                    style: TextStyle(
+                      color: AppColors.greenBright.withValues(alpha: 0.5),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
                   ),
                   const SizedBox(width: 4),
                   AnimatedRotation(
