@@ -112,7 +112,8 @@ class _ActivityHeader extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          if (actState.isActive) LiveBadge(elapsed: actState.elapsed),
+          if (actState.isActive || actState.isPaused)
+            LiveBadge(elapsed: actState.elapsed, paused: actState.isPaused),
         ],
       ),
     );

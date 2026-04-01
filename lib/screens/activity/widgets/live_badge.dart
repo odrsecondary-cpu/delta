@@ -3,10 +3,12 @@ import '../../../core/theme/app_theme.dart';
 
 /// Animated LIVE badge shown in the Activity header during an active ride.
 /// The green dot pulses to indicate an active GPS session.
+/// When [paused] is true, the dot stops pulsing and the text turns orange with strikethrough.
 class LiveBadge extends StatefulWidget {
-  const LiveBadge({super.key, required this.elapsed});
+  const LiveBadge({super.key, required this.elapsed, this.paused = false});
 
   final Duration elapsed;
+  final bool paused;
 
   @override
   State<LiveBadge> createState() => _LiveBadgeState();
@@ -23,10 +25,21 @@ class _LiveBadgeState extends State<LiveBadge>
     _pulse = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 900),
-    )..repeat(reverse: true);
+    );
     _opacity = Tween<double>(begin: 0.25, end: 1.0).animate(
       CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
     );
+    if (!widget.paused) _pulse.repeat(reverse: true);
+  }
+
+  @override
+  void didUpdateWidget(LiveBadge oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.paused && !oldWidget.paused) {
+      _pulse.stop();
+    } else if (!widget.paused && oldWidget.paused) {
+      _pulse.repeat(reverse: true);
+    }
   }
 
   @override
@@ -37,6 +50,7 @@ class _LiveBadgeState extends State<LiveBadge>
 
   @override
   Widget build(BuildContext context) {
+    final color = widget.paused ? AppColors.orange : AppColors.green;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -45,20 +59,23 @@ class _LiveBadgeState extends State<LiveBadge>
           child: Container(
             width: 7,
             height: 7,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: AppColors.green,
+              color: color,
             ),
           ),
         ),
         const SizedBox(width: 5),
-        const Text(
+        Text(
           'LIVE',
           style: TextStyle(
-            color: AppColors.green,
+            color: color,
             fontSize: 16,
             fontWeight: FontWeight.w700,
             letterSpacing: 1.2,
+            decoration: widget.paused ? TextDecoration.lineThrough : null,
+            decorationColor: AppColors.orange,
+            decorationThickness: 2,
           ),
         ),
         const SizedBox(width: 8),
