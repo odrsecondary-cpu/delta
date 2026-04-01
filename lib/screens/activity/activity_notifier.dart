@@ -76,7 +76,13 @@ class ActivityNotifier extends Notifier<ActivityState> {
   void resumeRide() {
     _justResumed = true;
     _startTicker();
-    state = state.copyWith(status: RideStatus.active);
+    // Pre-seed the new segment with the current position so the polyline
+    // can render as soon as the very next GPS fix arrives (needs >= 2 pts).
+    final pos = state.currentPosition;
+    final newSegments = pos != null
+        ? [...state.routeSegments, [pos]]
+        : state.routeSegments;
+    state = state.copyWith(status: RideStatus.active, routeSegments: newSegments);
   }
 
   /// Saves the completed ride to the database, then resets state.
@@ -136,14 +142,16 @@ class ActivityNotifier extends Notifier<ActivityState> {
     // --- Active: record stats and extend the route ---
 
     final isFirstPoint = state.trackPoints.isEmpty;
-    final skipDistance = isFirstPoint || _justResumed;
+    final wasJustResumed = _justResumed;
+    final skipDistance = isFirstPoint || wasJustResumed;
 
-    // Build route segments. A new segment begins at ride start and after
-    // each resume so the polyline doesn't bridge the pause gap.
+    // Build route segments. resumeRide() pre-seeds a new segment with the
+    // current position, so here we always append to the last segment
+    // (or create the very first one at ride start).
     final segments = state.routeSegments;
     final List<List<LatLng>> newSegments;
-    if (segments.isEmpty || _justResumed) {
-      newSegments = [...segments, [newLatLng]];
+    if (segments.isEmpty) {
+      newSegments = [[newLatLng]];
     } else {
       final updatedLast = [...segments.last, newLatLng];
       newSegments = [...segments.sublist(0, segments.length - 1), updatedLast];
@@ -167,6 +175,7 @@ class ActivityNotifier extends Notifier<ActivityState> {
       speed: speedKmh,
       altitude: pos.altitude,
       timestamp: DateTime.now(),
+      segmentBreak: wasJustResumed,
     );
 
     state = state.copyWith(

@@ -37,6 +37,7 @@ class _RouteMap extends StatelessWidget {
     final coords = trackPoints.map((tp) => tp.position).toList();
     final start = coords.first;
     final end = coords.last;
+    final segments = _buildSegments(trackPoints);
 
     return FlutterMap(
       options: MapOptions(
@@ -57,11 +58,13 @@ class _RouteMap extends StatelessWidget {
         ),
         PolylineLayer(
           polylines: [
-            Polyline(
-              points: coords,
-              color: AppColors.green,
-              strokeWidth: 2.5,
-            ),
+            for (final seg in segments)
+              if (seg.length >= 2)
+                Polyline(
+                  points: seg,
+                  color: AppColors.green,
+                  strokeWidth: 2.5,
+                ),
           ],
         ),
         CircleLayer(
@@ -100,6 +103,24 @@ class _RouteMap extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  /// Split a flat track-point list into polyline segments using the
+  /// [TrackPoint.segmentBreak] flag written by the recorder on resume.
+  List<List<LatLng>> _buildSegments(List<TrackPoint> points) {
+    if (points.isEmpty) return [];
+    final segments = <List<LatLng>>[];
+    var current = <LatLng>[points.first.position];
+    for (final tp in points.skip(1)) {
+      if (tp.segmentBreak) {
+        segments.add(current);
+        current = [tp.position];
+      } else {
+        current.add(tp.position);
+      }
+    }
+    segments.add(current);
+    return segments;
   }
 
   Marker _labelMarker(LatLng point, String label, Color color) {

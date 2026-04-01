@@ -8,7 +8,7 @@ import 'package:latlong2/latlong.dart';
 
 class DatabaseService {
   static const _dbName = 'gamma.db';
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
 
   Database? _db;
 
@@ -23,6 +23,7 @@ class DatabaseService {
       path,
       version: _dbVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
     );
   }
 
@@ -43,16 +44,25 @@ class DatabaseService {
     ''');
     await db.execute('''
       CREATE TABLE track_points (
-        id        INTEGER PRIMARY KEY AUTOINCREMENT,
-        ride_id   INTEGER NOT NULL,
-        lat       REAL    NOT NULL,
-        lng       REAL    NOT NULL,
-        speed     REAL    NOT NULL,
-        altitude  REAL    NOT NULL,
-        timestamp INTEGER NOT NULL,
+        id             INTEGER PRIMARY KEY AUTOINCREMENT,
+        ride_id        INTEGER NOT NULL,
+        lat            REAL    NOT NULL,
+        lng            REAL    NOT NULL,
+        speed          REAL    NOT NULL,
+        altitude       REAL    NOT NULL,
+        timestamp      INTEGER NOT NULL,
+        segment_break  INTEGER NOT NULL DEFAULT 0,
         FOREIGN KEY (ride_id) REFERENCES rides(id) ON DELETE CASCADE
       )
     ''');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await db.execute(
+        'ALTER TABLE track_points ADD COLUMN segment_break INTEGER NOT NULL DEFAULT 0',
+      );
+    }
   }
 
   // ── Reads ────────────────────────────────────────────────────────────────
@@ -88,6 +98,7 @@ class DatabaseService {
             altitude: (r['altitude'] as num).toDouble(),
             timestamp:
                 DateTime.fromMillisecondsSinceEpoch(r['timestamp'] as int),
+            segmentBreak: (r['segment_break'] as int? ?? 0) == 1,
           ),
         )
         .toList();
@@ -111,6 +122,7 @@ class DatabaseService {
           'speed': tp.speed,
           'altitude': tp.altitude,
           'timestamp': tp.timestamp.millisecondsSinceEpoch,
+          'segment_break': tp.segmentBreak ? 1 : 0,
         });
       }
       await batch.commit(noResult: true);
