@@ -35,6 +35,19 @@ class HistoryScreen extends ConsumerStatefulWidget {
 
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   final Set<String> _collapsed = {};
+  bool _initialized = false;
+
+  void _initCollapsed(List<({DateTime month, List<Ride> rides})> groups) {
+    if (_initialized) return;
+    _initialized = true;
+    final now = DateTime.now();
+    final currentKey = _monthKey(DateTime(now.year, now.month));
+    for (final g in groups) {
+      if (_monthKey(g.month) != currentKey) {
+        _collapsed.add(_monthKey(g.month));
+      }
+    }
+  }
 
   void _toggleSection(DateTime month) {
     setState(() {
@@ -76,14 +89,17 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
             ],
           ),
         ),
-        data: (rides) => rides.isEmpty
-            ? const _EmptyState()
-            : _RideList(
-                rides: rides,
-                collapsed: _collapsed,
-                onToggle: _toggleSection,
-                onRideTap: (ride) => context.push('/history/${ride.id}'),
-              ),
+        data: (rides) {
+          if (rides.isNotEmpty) _initCollapsed(rides.groupByMonth());
+          return rides.isEmpty
+              ? const _EmptyState()
+              : _RideList(
+                  rides: rides,
+                  collapsed: _collapsed,
+                  onToggle: _toggleSection,
+                  onRideTap: (ride) => context.push('/history/${ride.id}'),
+                );
+        },
       ),
     );
   }
