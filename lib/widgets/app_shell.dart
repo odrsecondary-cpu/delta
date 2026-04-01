@@ -44,7 +44,7 @@ class _AppBottomNav extends StatelessWidget {
       child: SafeArea(
         top: false,
         child: SizedBox(
-          height: 56,
+          height: 72,
           child: Row(
             children: [
               _NavItem(
@@ -99,22 +99,21 @@ class _NavItem extends StatelessWidget {
     return Expanded(
       child: InkWell(
         onTap: () => onTap(index),
+        splashColor: Colors.transparent,
+        highlightColor: Colors.transparent,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 22),
-            const SizedBox(height: 3),
-            if (isActive)
-              Container(
-                width: 4,
-                height: 4,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.green,
-                ),
-              )
-            else
-              const SizedBox(height: 4),
+            Icon(icon, color: color, size: isActive ? 36 : 30),
+            const SizedBox(height: 6),
+            Container(
+              width: 5,
+              height: 5,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isActive ? AppColors.green : Colors.transparent,
+              ),
+            ),
           ],
         ),
       ),
