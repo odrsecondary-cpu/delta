@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../core/router/app_router.dart';
 import '../core/theme/app_theme.dart';
 
 class AppShell extends StatefulWidget {
@@ -59,10 +60,14 @@ class _AppShellState extends State<AppShell>
       ),
       bottomNavigationBar: _AppBottomNav(
         currentIndex: widget.navigationShell.currentIndex,
-        onTap: (i) => widget.navigationShell.goBranch(
-          i,
-          initialLocation: i == widget.navigationShell.currentIndex,
-        ),
+        onTap: (i) {
+          final currentIndex = widget.navigationShell.currentIndex;
+          if (currentIndex == 1 && i != 1) {
+            historyNavigatorKey.currentState
+                ?.popUntil((route) => route.isFirst);
+          }
+          widget.navigationShell.goBranch(i, initialLocation: true);
+        },
       ),
     );
   }

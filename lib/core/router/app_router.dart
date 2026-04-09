@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../screens/activity/activity_screen.dart';
@@ -5,6 +6,8 @@ import '../../screens/history/history_screen.dart';
 import '../../screens/history_detail/history_detail_screen.dart';
 import '../../screens/statistics/statistics_screen.dart';
 import '../../widgets/app_shell.dart';
+
+final historyNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -22,6 +25,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ],
           ),
           StatefulShellBranch(
+            navigatorKey: historyNavigatorKey,
             routes: [
               GoRoute(
                 path: '/history',
