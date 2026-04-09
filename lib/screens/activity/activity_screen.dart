@@ -5,7 +5,6 @@ import '../../core/theme/app_theme.dart';
 import '../history/history_notifier.dart';
 import 'activity_notifier.dart';
 import 'activity_state.dart';
-import 'widgets/live_badge.dart';
 import 'widgets/map_panel.dart';
 import 'widgets/metric_card.dart';
 import 'widgets/ride_controls.dart';
@@ -35,7 +34,7 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            _ActivityHeader(actState: actState),
+            const SizedBox(height: 14),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -92,33 +91,6 @@ class _ActivityScreenState extends ConsumerState<ActivityScreen> {
   }
 }
 
-class _ActivityHeader extends StatelessWidget {
-  const _ActivityHeader({required this.actState});
-
-  final ActivityState actState;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Activity',
-            style: TextStyle(
-              color: AppColors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          if (actState.isActive || actState.isPaused)
-            LiveBadge(elapsed: actState.elapsed, paused: actState.isPaused),
-        ],
-      ),
-    );
-  }
-}
 
 class _PermissionBanner extends StatelessWidget {
   const _PermissionBanner();

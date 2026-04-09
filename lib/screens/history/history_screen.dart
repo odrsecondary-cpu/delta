@@ -70,7 +70,6 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const _HistoryHeader(),
             Expanded(
               child: ridesAsync.when(
                 loading: () => const Center(
@@ -139,7 +138,7 @@ class _RideList extends StatelessWidget {
       children: [
         Expanded(
           child: ListView.builder(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 8),
             itemCount: groups.length,
             itemBuilder: (_, i) {
               final group = groups[i];
@@ -156,27 +155,6 @@ class _RideList extends StatelessWidget {
         ),
         TotalBar(rides: rides),
       ],
-    );
-  }
-}
-
-// ── Header ────────────────────────────────────────────────────────────────────
-
-class _HistoryHeader extends StatelessWidget {
-  const _HistoryHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Text(
-        'History',
-        style: TextStyle(
-          color: AppColors.white,
-          fontSize: 28,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
     );
   }
 }
