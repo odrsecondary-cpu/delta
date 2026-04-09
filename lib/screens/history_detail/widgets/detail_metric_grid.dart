@@ -24,13 +24,12 @@ class DetailMetricGrid extends StatelessWidget {
                   label: 'DISTANCE',
                   value: RideFormatters.distanceValue(ride.totalDistance),
                   unit: 'km',
-                  accented: true,
                 ),
               ),
               const Gap(6),
               Expanded(
                 child: _MetricCard(
-                  label: 'MOVING TIME',
+                  label: 'TIME',
                   value: RideFormatters.duration(ride.movingTime),
                   unit: '',
                 ),
