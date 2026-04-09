@@ -97,58 +97,87 @@ class _MapPanelState extends ConsumerState<MapPanel> {
         Positioned(
           top: 10,
           right: 10,
-          child: _ZoomControls(mapController: _mapController),
+          child: _MapControls(
+            mapController: _mapController,
+            currentPosition: actState.currentPosition,
+          ),
         ),
       ],
     );
   }
 }
 
-class _ZoomControls extends StatelessWidget {
-  const _ZoomControls({required this.mapController});
+class _MapControls extends StatelessWidget {
+  const _MapControls({
+    required this.mapController,
+    required this.currentPosition,
+  });
 
   final MapController mapController;
+  final LatLng? currentPosition;
+
+  static final _decoration = BoxDecoration(
+    color: Colors.white.withValues(alpha: 0.9),
+    borderRadius: BorderRadius.circular(12),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withValues(alpha: 0.15),
+        blurRadius: 4,
+        offset: const Offset(0, 2),
+      ),
+    ],
+  );
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.9),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.15),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          decoration: _decoration,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _MapButton(
+                icon: Icons.add,
+                onTap: () => mapController.move(
+                  mapController.camera.center,
+                  mapController.camera.zoom + 1,
+                ),
+              ),
+              Container(height: 0.5, color: Colors.black12),
+              _MapButton(
+                icon: Icons.remove,
+                onTap: () => mapController.move(
+                  mapController.camera.center,
+                  mapController.camera.zoom - 1,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _ZoomButton(
-            icon: Icons.add,
-            onTap: () => mapController.move(
-              mapController.camera.center,
-              mapController.camera.zoom + 1,
-            ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: _decoration,
+          child: _MapButton(
+            icon: Icons.gps_fixed,
+            onTap: () {
+              if (currentPosition != null) {
+                mapController.move(
+                  currentPosition!,
+                  mapController.camera.zoom,
+                );
+              }
+            },
           ),
-          Container(height: 0.5, color: Colors.black12),
-          _ZoomButton(
-            icon: Icons.remove,
-            onTap: () => mapController.move(
-              mapController.camera.center,
-              mapController.camera.zoom - 1,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
 
-class _ZoomButton extends StatelessWidget {
-  const _ZoomButton({required this.icon, required this.onTap});
+class _MapButton extends StatelessWidget {
+  const _MapButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
