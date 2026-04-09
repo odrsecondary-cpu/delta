@@ -13,28 +13,30 @@ class SplitsTable extends StatelessWidget {
   Widget build(BuildContext context) {
     if (splits.isEmpty) return const SizedBox.shrink();
 
-    final maxSpeed = splits.fold(0.0, (m, s) => s.speedKmh > m ? s.speedKmh : m);
-
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'SPLITS',
-            style: TextStyle(
-              color: AppColors.whiteDim,
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.5,
+          const Padding(
+            padding: EdgeInsets.only(left: 12),
+            child: Text(
+              'SPLITS',
+              style: TextStyle(
+                color: AppColors.whiteDim,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
           const Gap(8),
+          const _SplitsHeader(),
+          const Gap(4),
           for (final split in splits)
             _SplitRow(
               key: ValueKey(split.km),
               split: split,
-              maxSpeedKmh: maxSpeed,
             ),
         ],
       ),
@@ -42,21 +44,43 @@ class SplitsTable extends StatelessWidget {
   }
 }
 
+class _SplitsHeader extends StatelessWidget {
+  const _SplitsHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    const style = TextStyle(
+      color: AppColors.whiteDim,
+      fontSize: 11,
+      fontWeight: FontWeight.w500,
+      letterSpacing: 0.4,
+    );
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 10),
+      child: Row(
+        children: [
+          const SizedBox(width: 52, child: Text('KM', style: style)),
+          const Expanded(child: Center(child: Text('TIME', style: style))),
+          SizedBox(
+            width: 80,
+            child: const Text('SPEED', textAlign: TextAlign.right, style: style),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _SplitRow extends StatelessWidget {
-  const _SplitRow({
-    super.key,
-    required this.split,
-    required this.maxSpeedKmh,
-  });
+  const _SplitRow({super.key, required this.split});
 
   final KmSplit split;
-  final double maxSpeedKmh;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
@@ -64,52 +88,41 @@ class _SplitRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Km index
+          // Kilometer
           SizedBox(
-            width: 36,
+            width: 52,
             child: Text(
               '${split.km} km',
-              style: const TextStyle(color: AppColors.whiteMuted, fontSize: 16),
+              style: const TextStyle(
+                color: AppColors.whiteMuted,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
-          const Gap(8),
-          // Speed bar (proportional)
+          // Time (pace mm:ss min)
           Expanded(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final barWidth = maxSpeedKmh > 0
-                    ? constraints.maxWidth * (split.speedKmh / maxSpeedKmh)
-                    : 0.0;
-                return Align(
-                  alignment: Alignment.centerLeft,
-                  child: Container(
-                    height: 4,
-                    width: barWidth,
-                    decoration: BoxDecoration(
-                      color: AppColors.green.withValues(alpha: 0.6),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                );
-              },
+            child: Center(
+              child: Text(
+                '${split.timeLabel} min',
+                style: const TextStyle(
+                  color: AppColors.whiteMuted,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ),
-          const Gap(8),
-          // Pace
-          Text(
-            split.paceLabel,
-            style: const TextStyle(color: AppColors.whiteMuted, fontSize: 16),
-          ),
-          const Gap(10),
           // Speed
           SizedBox(
-            width: 36,
+            width: 80,
             child: Text(
-              split.speedLabel,
+              '${split.speedLabel} km/h',
               textAlign: TextAlign.right,
+              maxLines: 1,
               style: const TextStyle(
                 color: AppColors.white,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
             ),

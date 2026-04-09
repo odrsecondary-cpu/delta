@@ -22,13 +22,16 @@ class ElevationChartPanel extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'ELEVATION PROFILE',
-            style: TextStyle(
-              color: AppColors.whiteDim,
-              fontSize: 10,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.5,
+          const Padding(
+            padding: EdgeInsets.only(left: 12),
+            child: Text(
+              'ELEVATION PROFILE',
+              style: TextStyle(
+                color: AppColors.whiteDim,
+                fontSize: 10,
+                fontWeight: FontWeight.w500,
+                letterSpacing: 0.5,
+              ),
             ),
           ),
           const Gap(8),
