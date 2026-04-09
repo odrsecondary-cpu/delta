@@ -55,14 +55,14 @@ class _AppBottomNav extends StatelessWidget {
                 onTap: onTap,
               ),
               _NavItem(
-                icon: Icons.bar_chart,
+                icon: Icons.history,
                 label: 'History',
                 index: 1,
                 currentIndex: currentIndex,
                 onTap: onTap,
               ),
               _NavItem(
-                icon: Icons.person,
+                icon: Icons.bar_chart,
                 label: 'Statistics',
                 index: 2,
                 currentIndex: currentIndex,
@@ -95,6 +95,7 @@ class _NavItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isActive = index == currentIndex;
     final color = isActive ? AppColors.green : AppColors.whiteDim;
+    final size = isActive ? 36.0 : 30.0;
 
     return Expanded(
       child: InkWell(
@@ -104,7 +105,7 @@ class _NavItem extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: isActive ? 36 : 30),
+            Icon(icon, color: color, size: size),
             const SizedBox(height: 6),
             Container(
               width: 5,
