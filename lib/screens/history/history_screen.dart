@@ -66,40 +66,51 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: ridesAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: AppColors.green),
-        ),
-        error: (_, _) => Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Could not load rides',
-                style: TextStyle(color: AppColors.whiteMuted),
-              ),
-              const SizedBox(height: 12),
-              TextButton(
-                onPressed: () => ref.invalidate(historyProvider),
-                child: const Text(
-                  'Retry',
-                  style: TextStyle(color: AppColors.green),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const _HistoryHeader(),
+            Expanded(
+              child: ridesAsync.when(
+                loading: () => const Center(
+                  child: CircularProgressIndicator(color: AppColors.green),
                 ),
+                error: (_, _) => Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Could not load rides',
+                        style: TextStyle(color: AppColors.whiteMuted),
+                      ),
+                      const SizedBox(height: 12),
+                      TextButton(
+                        onPressed: () => ref.invalidate(historyProvider),
+                        child: const Text(
+                          'Retry',
+                          style: TextStyle(color: AppColors.green),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                data: (rides) {
+                  if (rides.isNotEmpty) _initCollapsed(rides.groupByMonth());
+                  return rides.isEmpty
+                      ? const _EmptyState()
+                      : _RideList(
+                          rides: rides,
+                          collapsed: _collapsed,
+                          onToggle: _toggleSection,
+                          onRideTap: (ride) =>
+                              context.push('/history/${ride.id}'),
+                        );
+                },
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-        data: (rides) {
-          if (rides.isNotEmpty) _initCollapsed(rides.groupByMonth());
-          return rides.isEmpty
-              ? const _EmptyState()
-              : _RideList(
-                  rides: rides,
-                  collapsed: _collapsed,
-                  onToggle: _toggleSection,
-                  onRideTap: (ride) => context.push('/history/${ride.id}'),
-                );
-        },
       ),
     );
   }
@@ -123,13 +134,12 @@ class _RideList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final groups = rides.groupByMonth();
-    final topPad = MediaQuery.of(context).padding.top;
 
     return Column(
       children: [
         Expanded(
           child: ListView.builder(
-            padding: EdgeInsets.fromLTRB(16, topPad + 8, 16, 8),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             itemCount: groups.length,
             itemBuilder: (_, i) {
               final group = groups[i];
@@ -146,6 +156,27 @@ class _RideList extends StatelessWidget {
         ),
         TotalBar(rides: rides),
       ],
+    );
+  }
+}
+
+// ── Header ────────────────────────────────────────────────────────────────────
+
+class _HistoryHeader extends StatelessWidget {
+  const _HistoryHeader();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      child: Text(
+        'History',
+        style: TextStyle(
+          color: AppColors.white,
+          fontSize: 28,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }
