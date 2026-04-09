@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -27,6 +29,31 @@ class DetailMapPanel extends StatelessWidget {
   }
 }
 
+// ---------------------------------------------------------------------------
+// Heatmap gradient — 6 stops, blue → cyan → green → yellow → orange → red
+// ---------------------------------------------------------------------------
+
+const _gradientColors = [
+  Color(0xFF2979FF), // 0.00 — blue
+  Color(0xFF00B0FF), // 0.20 — cyan
+  Color(0xFF00E676), // 0.40 — green
+  Color(0xFFFFD600), // 0.60 — yellow
+  Color(0xFFFF6D00), // 0.80 — orange
+  Color(0xFFFF1744), // 1.00 — red
+];
+
+Color _speedColor(double t) {
+  final stops = _gradientColors.length - 1;
+  final scaled = t.clamp(0.0, 1.0) * stops;
+  final lo = scaled.floor().clamp(0, stops - 1);
+  final hi = lo + 1;
+  return Color.lerp(_gradientColors[lo], _gradientColors[hi], scaled - lo)!;
+}
+
+// ---------------------------------------------------------------------------
+// Map widget
+// ---------------------------------------------------------------------------
+
 class _RouteMap extends StatefulWidget {
   const _RouteMap({required this.trackPoints});
 
@@ -40,13 +67,27 @@ class _RouteMapState extends State<_RouteMap> {
   final _mapController = MapController();
 
   late final List<LatLng> _coords;
-  late final List<List<LatLng>> _segments;
+  late final List<Polyline> _speedPolylines;
+  late final double _minSpeed;
+  late final double _maxSpeed;
+  late final bool _labelsClose;
 
   @override
   void initState() {
     super.initState();
     _coords = widget.trackPoints.map((tp) => tp.position).toList();
-    _segments = _buildSegments(widget.trackPoints);
+
+    final speeds = widget.trackPoints.map((tp) => tp.speed).toList();
+    _minSpeed = speeds.reduce(math.min);
+    _maxSpeed = speeds.reduce(math.max);
+    _speedPolylines = _buildSpeedPolylines(widget.trackPoints);
+
+    final start = _coords.first;
+    final end = _coords.last;
+    // ~200 m threshold: if start/end are this close the labels would overlap
+    _labelsClose =
+        (start.latitude - end.latitude).abs() < 0.002 &&
+        (start.longitude - end.longitude).abs() < 0.002;
   }
 
   @override
@@ -62,6 +103,33 @@ class _RouteMapState extends State<_RouteMap> {
         padding: const EdgeInsets.all(24),
       ),
     );
+  }
+
+  List<Polyline> _buildSpeedPolylines(List<TrackPoint> points) {
+    if (points.length < 2) return [];
+    final speedRange = _maxSpeed - _minSpeed;
+    final polylines = <Polyline>[];
+
+    for (int i = 0; i < points.length - 1; i++) {
+      final current = points[i];
+      final next = points[i + 1];
+      if (next.segmentBreak) continue;
+
+      final avgSpeed = (current.speed + next.speed) / 2;
+      final t =
+          speedRange > 0
+              ? ((avgSpeed - _minSpeed) / speedRange).clamp(0.0, 1.0)
+              : 0.5;
+
+      polylines.add(Polyline(
+        points: [current.position, next.position],
+        color: _speedColor(t),
+        strokeWidth: 3.5,
+        strokeCap: StrokeCap.round,
+        strokeJoin: StrokeJoin.round,
+      ));
+    }
+    return polylines;
   }
 
   @override
@@ -89,50 +157,53 @@ class _RouteMapState extends State<_RouteMap> {
               subdomains: const ['a', 'b', 'c', 'd'],
               userAgentPackageName: 'com.example.gamma',
             ),
-            PolylineLayer(
-              polylines: [
-                for (final seg in _segments)
-                  if (seg.length >= 2)
-                    Polyline(
-                      points: seg,
-                      color: AppColors.green,
-                      strokeWidth: 3,
-                    ),
-              ],
-            ),
+            PolylineLayer(polylines: _speedPolylines),
             CircleLayer(
               circles: [
+                // Start — green
                 CircleMarker(
                   point: start,
-                  radius: 6,
-                  color: AppColors.whiteMuted,
-                  borderColor: AppColors.white,
-                  borderStrokeWidth: 1,
-                ),
-                CircleMarker(
-                  point: end,
-                  radius: 12,
-                  color: AppColors.green.withValues(alpha: 0.25),
-                  borderColor: Colors.transparent,
-                  borderStrokeWidth: 0,
-                ),
-                CircleMarker(
-                  point: end,
-                  radius: 6,
+                  radius: 7,
                   color: AppColors.green,
+                  borderColor: Colors.white,
+                  borderStrokeWidth: 1.5,
+                ),
+                // End — red glow + dot
+                CircleMarker(
+                  point: end,
+                  radius: 13,
+                  color: const Color(0xFFFF1744).withValues(alpha: 0.22),
                   borderColor: Colors.transparent,
                   borderStrokeWidth: 0,
+                ),
+                CircleMarker(
+                  point: end,
+                  radius: 7,
+                  color: const Color(0xFFFF1744),
+                  borderColor: Colors.white,
+                  borderStrokeWidth: 1.5,
                 ),
               ],
             ),
             MarkerLayer(
               markers: [
-                _labelMarker(start, 'Start', AppColors.whiteMuted),
-                _labelMarker(end, 'End', AppColors.green),
+                _labelMarker(
+                  start, 'Start', AppColors.green,
+                  alignment: _labelsClose
+                      ? const Alignment(-1.2, -3.4)
+                      : const Alignment(0, -3.4),
+                ),
+                _labelMarker(
+                  end, 'End', const Color(0xFFFF1744),
+                  alignment: _labelsClose
+                      ? const Alignment(1.2, -3.4)
+                      : const Alignment(0, -3.4),
+                ),
               ],
             ),
           ],
         ),
+        // Map controls — top right
         Positioned(
           top: 10,
           right: 10,
@@ -141,44 +212,117 @@ class _RouteMapState extends State<_RouteMap> {
             onFitRoute: _fitRoute,
           ),
         ),
+        // Speed legend — bottom, full width
+        Positioned.fill(
+          child: Align(
+            alignment: Alignment.bottomLeft,
+            child: FractionallySizedBox(
+              widthFactor: 0.5,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 10, bottom: 10),
+                child: _SpeedLegend(
+                  minSpeed: _minSpeed,
+                  maxSpeed: _maxSpeed,
+                ),
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  List<List<LatLng>> _buildSegments(List<TrackPoint> points) {
-    if (points.isEmpty) return [];
-    final segments = <List<LatLng>>[];
-    var current = <LatLng>[points.first.position];
-    for (final tp in points.skip(1)) {
-      if (tp.segmentBreak) {
-        segments.add(current);
-        current = [tp.position];
-      } else {
-        current.add(tp.position);
-      }
-    }
-    segments.add(current);
-    return segments;
-  }
-
-  Marker _labelMarker(LatLng point, String label, Color color) {
+  Marker _labelMarker(
+    LatLng point,
+    String label,
+    Color color, {
+    Alignment alignment = const Alignment(0, -3.4),
+  }) {
     return Marker(
       point: point,
-      width: 40,
+      width: 44,
       height: 20,
-      alignment: const Alignment(0, -3.2),
+      alignment: alignment,
       child: Text(
         label,
         textAlign: TextAlign.center,
         style: TextStyle(
           color: color,
           fontSize: 9,
-          fontWeight: FontWeight.w500,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// Speed legend overlay
+// ---------------------------------------------------------------------------
+
+class _SpeedLegend extends StatelessWidget {
+  const _SpeedLegend({
+    required this.minSpeed,
+    required this.maxSpeed,
+  });
+
+  final double minSpeed;
+  final double maxSpeed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.58),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                '${minSpeed.toStringAsFixed(0)}',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(width: 5),
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(3),
+                  child: Container(
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      gradient: LinearGradient(colors: _gradientColors),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 5),
+              Text(
+                '${maxSpeed.toStringAsFixed(0)} km/h',
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 9,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Map controls
+// ---------------------------------------------------------------------------
 
 class _MapControls extends StatelessWidget {
   const _MapControls({
@@ -261,6 +405,10 @@ class _ControlButton extends StatelessWidget {
     );
   }
 }
+
+// ---------------------------------------------------------------------------
+// No data placeholder
+// ---------------------------------------------------------------------------
 
 class _NoDataPlaceholder extends StatelessWidget {
   @override
