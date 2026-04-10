@@ -99,7 +99,8 @@ class _MapPanelState extends ConsumerState<MapPanel> {
           right: 10,
           child: _MapControls(
             mapController: _mapController,
-            currentPosition: actState.currentPosition,
+            centerTarget: actState.currentPosition ?? _defaultCenter,
+            hasFix: actState.currentPosition != null,
           ),
         ),
       ],
@@ -110,11 +111,13 @@ class _MapPanelState extends ConsumerState<MapPanel> {
 class _MapControls extends StatelessWidget {
   const _MapControls({
     required this.mapController,
-    required this.currentPosition,
+    required this.centerTarget,
+    required this.hasFix,
   });
 
   final MapController mapController;
-  final LatLng? currentPosition;
+  final LatLng centerTarget;
+  final bool hasFix;
 
   static final _decoration = BoxDecoration(
     color: Colors.white.withValues(alpha: 0.9),
@@ -160,15 +163,11 @@ class _MapControls extends StatelessWidget {
         Container(
           decoration: _decoration,
           child: _MapButton(
-            icon: Icons.gps_fixed,
-            onTap: () {
-              if (currentPosition != null) {
-                mapController.move(
-                  currentPosition!,
-                  mapController.camera.zoom,
-                );
-              }
-            },
+            icon: hasFix ? Icons.gps_fixed : Icons.gps_not_fixed,
+            onTap: () => mapController.move(
+              centerTarget,
+              mapController.camera.zoom,
+            ),
           ),
         ),
       ],
