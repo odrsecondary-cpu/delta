@@ -214,6 +214,7 @@ class _MapButtonState extends State<_MapButton>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _handleTap,
+      behavior: HitTestBehavior.opaque,
       child: ScaleTransition(
         scale: _scale,
         child: SizedBox(

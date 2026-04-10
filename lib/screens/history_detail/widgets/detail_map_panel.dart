@@ -373,6 +373,7 @@ class _ControlButtonState extends State<_ControlButton>
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: _handleTap,
+      behavior: HitTestBehavior.opaque,
       child: ScaleTransition(
         scale: _scale,
         child: SizedBox(
