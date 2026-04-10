@@ -70,8 +70,6 @@ class _RouteMapState extends State<_RouteMap> {
   late final List<Polyline> _speedPolylines;
   late final double _minSpeed;
   late final double _maxSpeed;
-  late final bool _labelsClose;
-
   @override
   void initState() {
     super.initState();
@@ -81,13 +79,6 @@ class _RouteMapState extends State<_RouteMap> {
     _minSpeed = speeds.reduce(math.min);
     _maxSpeed = speeds.reduce(math.max);
     _speedPolylines = _buildSpeedPolylines(widget.trackPoints);
-
-    final start = _coords.first;
-    final end = _coords.last;
-    // ~200 m threshold: if start/end are this close the labels would overlap
-    _labelsClose =
-        (start.latitude - end.latitude).abs() < 0.002 &&
-        (start.longitude - end.longitude).abs() < 0.002;
   }
 
   @override
@@ -185,22 +176,6 @@ class _RouteMapState extends State<_RouteMap> {
                 ),
               ],
             ),
-            MarkerLayer(
-              markers: [
-                _labelMarker(
-                  start, 'Start', AppColors.green,
-                  alignment: _labelsClose
-                      ? const Alignment(-1.2, -3.4)
-                      : const Alignment(0, -3.4),
-                ),
-                _labelMarker(
-                  end, 'End', const Color(0xFFFF1744),
-                  alignment: _labelsClose
-                      ? const Alignment(1.2, -3.4)
-                      : const Alignment(0, -3.4),
-                ),
-              ],
-            ),
           ],
         ),
         // Map controls — top right
@@ -232,28 +207,6 @@ class _RouteMapState extends State<_RouteMap> {
     );
   }
 
-  Marker _labelMarker(
-    LatLng point,
-    String label,
-    Color color, {
-    Alignment alignment = const Alignment(0, -3.4),
-  }) {
-    return Marker(
-      point: point,
-      width: 44,
-      height: 20,
-      alignment: alignment,
-      child: Text(
-        label,
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: color,
-          fontSize: 9,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
