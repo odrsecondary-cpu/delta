@@ -51,6 +51,77 @@ Color _speedColor(double t) {
 }
 
 // ---------------------------------------------------------------------------
+// Douglas–Peucker simplification (respects segmentBreak boundaries)
+// ---------------------------------------------------------------------------
+
+/// Perpendicular distance from [p] to the line defined by [a]→[b],
+/// computed in degree-space (good enough for small GPS segments).
+double _perpendicularDistance(LatLng p, LatLng a, LatLng b) {
+  final dx = b.longitude - a.longitude;
+  final dy = b.latitude - a.latitude;
+
+  if (dx == 0 && dy == 0) {
+    final dLat = p.latitude - a.latitude;
+    final dLng = p.longitude - a.longitude;
+    return math.sqrt(dLat * dLat + dLng * dLng);
+  }
+
+  final t = ((p.longitude - a.longitude) * dx + (p.latitude - a.latitude) * dy) /
+      (dx * dx + dy * dy);
+  final projLat = a.latitude + t * dy;
+  final projLng = a.longitude + t * dx;
+  final dLat = p.latitude - projLat;
+  final dLng = p.longitude - projLng;
+  return math.sqrt(dLat * dLat + dLng * dLng);
+}
+
+List<TrackPoint> _dpSimplify(List<TrackPoint> pts, double epsilon) {
+  if (pts.length <= 2) return List.of(pts);
+
+  double maxDist = 0;
+  int maxIdx = 0;
+  final start = pts.first.position;
+  final end = pts.last.position;
+
+  for (int i = 1; i < pts.length - 1; i++) {
+    final d = _perpendicularDistance(pts[i].position, start, end);
+    if (d > maxDist) {
+      maxDist = d;
+      maxIdx = i;
+    }
+  }
+
+  if (maxDist > epsilon) {
+    final left = _dpSimplify(pts.sublist(0, maxIdx + 1), epsilon);
+    final right = _dpSimplify(pts.sublist(maxIdx), epsilon);
+    return [...left.take(left.length - 1), ...right];
+  }
+
+  return [pts.first, pts.last];
+}
+
+/// Splits track by [segmentBreak], simplifies each sub-segment independently,
+/// then reassembles. Epsilon is in decimal degrees (~0.00005° ≈ 5 m).
+List<TrackPoint> _simplifyRoute(List<TrackPoint> pts, {double epsilon = 0.00005}) {
+  if (pts.length <= 2) return pts;
+
+  final result = <TrackPoint>[];
+  var segStart = 0;
+
+  for (int i = 1; i <= pts.length; i++) {
+    final atEnd = i == pts.length;
+    final atBreak = !atEnd && pts[i].segmentBreak;
+
+    if (atEnd || atBreak) {
+      result.addAll(_dpSimplify(pts.sublist(segStart, i), epsilon));
+      segStart = i;
+    }
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
 // Map widget
 // ---------------------------------------------------------------------------
 
@@ -73,12 +144,13 @@ class _RouteMapState extends State<_RouteMap> {
   @override
   void initState() {
     super.initState();
-    _coords = widget.trackPoints.map((tp) => tp.position).toList();
+    final simplified = _simplifyRoute(widget.trackPoints);
+    _coords = simplified.map((tp) => tp.position).toList();
 
-    final speeds = widget.trackPoints.map((tp) => tp.speed).toList();
+    final speeds = simplified.map((tp) => tp.speed).toList();
     _minSpeed = speeds.reduce(math.min);
     _maxSpeed = speeds.reduce(math.max);
-    _speedPolylines = _buildSpeedPolylines(widget.trackPoints);
+    _speedPolylines = _buildSpeedPolylines(simplified);
   }
 
   @override
