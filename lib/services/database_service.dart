@@ -8,7 +8,7 @@ import 'package:latlong2/latlong.dart';
 
 class DatabaseService {
   static const _dbName = 'gamma.db';
-  static const _dbVersion = 2;
+  static const _dbVersion = 3;
 
   Database? _db;
 
@@ -55,12 +55,26 @@ class DatabaseService {
         FOREIGN KEY (ride_id) REFERENCES rides(id) ON DELETE CASCADE
       )
     ''');
+    await db.execute(
+      'CREATE INDEX idx_track_points_ride_id ON track_points(ride_id)',
+    );
+    await db.execute(
+      'CREATE INDEX idx_rides_start_time ON rides(start_time DESC)',
+    );
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
     if (oldVersion < 2) {
       await db.execute(
         'ALTER TABLE track_points ADD COLUMN segment_break INTEGER NOT NULL DEFAULT 0',
+      );
+    }
+    if (oldVersion < 3) {
+      await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_track_points_ride_id ON track_points(ride_id)',
+      );
+      await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_rides_start_time ON rides(start_time DESC)',
       );
     }
   }
