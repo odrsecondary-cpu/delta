@@ -172,21 +172,55 @@ class _MapControls extends StatelessWidget {
   }
 }
 
-class _MapButton extends StatelessWidget {
+class _MapButton extends StatefulWidget {
   const _MapButton({required this.icon, required this.onTap});
 
   final IconData icon;
   final VoidCallback onTap;
 
   @override
+  State<_MapButton> createState() => _MapButtonState();
+}
+
+class _MapButtonState extends State<_MapButton>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _scale;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 90),
+    );
+    _scale = Tween<double>(begin: 1.0, end: 0.78).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _handleTap() {
+    _controller.forward().then((_) => _controller.reverse());
+    widget.onTap();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: SizedBox(
-        width: 36,
-        height: 36,
-        child: Icon(icon, size: 18, color: Colors.black87),
+    return GestureDetector(
+      onTap: _handleTap,
+      child: ScaleTransition(
+        scale: _scale,
+        child: SizedBox(
+          width: 36,
+          height: 36,
+          child: Icon(widget.icon, size: 18, color: Colors.black87),
+        ),
       ),
     );
   }
