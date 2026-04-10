@@ -1,10 +1,16 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:geolocator_android/geolocator_android.dart';
 
 class GpsService {
-  static const _locationSettings = LocationSettings(
+  static final _locationSettings = AndroidSettings(
     accuracy: LocationAccuracy.high,
     distanceFilter: 3, // meters — skip tiny noise
+    foregroundNotificationConfig: ForegroundNotificationConfig(
+      notificationTitle: 'Gamma',
+      notificationText: 'Recording your ride in the background',
+      enableWakeLock: true,
+    ),
   );
 
   Future<bool> requestPermission() async {
