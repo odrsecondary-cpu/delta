@@ -166,8 +166,8 @@ class ActivityNotifier extends Notifier<ActivityState> {
         LatLng(pos.latitude, pos.longitude),
       ).toDouble();
       final dtSec =
-          DateTime.now().difference(last.timestamp).inMilliseconds / 1000.0;
-      if (dtSec > 0 && distM / dtSec * 3.6 > _maxImpliedKmh) return;
+          pos.timestamp.difference(last.timestamp).inMilliseconds / 1000.0;
+      if (dtSec >= 0.001 && distM / dtSec * 3.6 > _maxImpliedKmh) return;
     }
 
     final newLatLng = LatLng(pos.latitude, pos.longitude);
@@ -218,7 +218,7 @@ class ActivityNotifier extends Notifier<ActivityState> {
       position: newLatLng,
       speed: speedKmh,
       altitude: pos.altitude,
-      timestamp: DateTime.now(),
+      timestamp: pos.timestamp,
       segmentBreak: wasJustResumed,
     );
 
