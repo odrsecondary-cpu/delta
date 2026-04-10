@@ -209,7 +209,7 @@ class ActivityNotifier extends Notifier<ActivityState> {
     }
 
     double addedGain = 0;
-    if (!isFirstPoint) {
+    if (!isFirstPoint && !wasJustResumed) {
       final diff = pos.altitude - state.altitudeM;
       if (diff > 0) addedGain = diff;
     }
