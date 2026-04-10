@@ -187,90 +187,10 @@ class _RouteMapState extends State<_RouteMap> {
             onFitRoute: _fitRoute,
           ),
         ),
-        // Speed legend — bottom, full width
-        Positioned.fill(
-          child: Align(
-            alignment: Alignment.bottomLeft,
-            child: FractionallySizedBox(
-              widthFactor: 0.5,
-              child: Padding(
-                padding: const EdgeInsets.only(left: 10, bottom: 10),
-                child: _SpeedLegend(
-                  minSpeed: _minSpeed,
-                  maxSpeed: _maxSpeed,
-                ),
-              ),
-            ),
-          ),
-        ),
       ],
     );
   }
 
-}
-
-// ---------------------------------------------------------------------------
-// Speed legend overlay
-// ---------------------------------------------------------------------------
-
-class _SpeedLegend extends StatelessWidget {
-  const _SpeedLegend({
-    required this.minSpeed,
-    required this.maxSpeed,
-  });
-
-  final double minSpeed;
-  final double maxSpeed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.58),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                '${minSpeed.toStringAsFixed(0)}',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(width: 5),
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(3),
-                  child: Container(
-                    height: 6,
-                    decoration: const BoxDecoration(
-                      gradient: LinearGradient(colors: _gradientColors),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(width: 5),
-              Text(
-                '${maxSpeed.toStringAsFixed(0)} km/h',
-                style: const TextStyle(
-                  color: Colors.white70,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 // ---------------------------------------------------------------------------
