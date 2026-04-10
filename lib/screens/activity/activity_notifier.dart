@@ -20,6 +20,10 @@ class ActivityNotifier extends Notifier<ActivityState> {
 
   static const _distanceCalc = Distance();
 
+  // GPS outlier filter thresholds.
+  static const _maxAccuracyM = 50.0;   // ignore fixes with poor accuracy
+  static const _maxImpliedKmh = 100.0; // ignore position jumps above this speed
+
   @override
   ActivityState build() {
     ref.onDispose(() {
@@ -40,11 +44,18 @@ class ActivityNotifier extends Notifier<ActivityState> {
       state = state.copyWith(permissionDenied: true);
       return;
     }
-    _bgLocationSub = gps.positionStream().listen((pos) {
-      state = state.copyWith(
-        currentPosition: LatLng(pos.latitude, pos.longitude),
-      );
-    });
+    _bgLocationSub = gps.positionStream().listen(
+      (pos) {
+        state = state.copyWith(
+          currentPosition: LatLng(pos.latitude, pos.longitude),
+        );
+      },
+      onError: (Object _) {
+        _bgLocationSub?.cancel();
+        _bgLocationSub = null;
+      },
+      cancelOnError: true,
+    );
   }
 
   Future<void> startRide() async {
@@ -61,9 +72,21 @@ class ActivityNotifier extends Notifier<ActivityState> {
       status: RideStatus.active,
       startTime: DateTime.now(),
       permissionDenied: false,
+      gpsError: null,
     );
     _startTicker();
-    _gpsSub = gps.positionStream().listen(_onPosition);
+    _gpsSub = gps.positionStream().listen(
+      _onPosition,
+      onError: (Object _) {
+        _ticker?.cancel();
+        _ticker = null;
+        state = state.copyWith(
+          status: RideStatus.paused,
+          gpsError: 'GPS signal lost. Ride paused.',
+        );
+      },
+      cancelOnError: true,
+    );
   }
 
   void pauseRide() {
@@ -108,7 +131,13 @@ class ActivityNotifier extends Notifier<ActivityState> {
       trackPoints: s.trackPoints,
     );
 
-    await ref.read(databaseServiceProvider).insertRide(ride);
+    state = state.copyWith(saveError: null);
+    try {
+      await ref.read(databaseServiceProvider).insertRide(ride);
+    } catch (_) {
+      state = state.copyWith(saveError: 'Could not save ride. Please try again.');
+      return;
+    }
 
     _gpsSub?.cancel();
     _gpsSub = null;
@@ -126,6 +155,21 @@ class ActivityNotifier extends Notifier<ActivityState> {
   }
 
   void _onPosition(Position pos) {
+    // Layer 1: drop fixes the device itself flags as inaccurate.
+    if (pos.accuracy > _maxAccuracyM) return;
+
+    // Layer 2: drop fixes that imply a physically impossible speed jump.
+    if (state.trackPoints.isNotEmpty && !_justResumed) {
+      final last = state.trackPoints.last;
+      final distM = _distanceCalc(
+        last.position,
+        LatLng(pos.latitude, pos.longitude),
+      ).toDouble();
+      final dtSec =
+          DateTime.now().difference(last.timestamp).inMilliseconds / 1000.0;
+      if (dtSec > 0 && distM / dtSec * 3.6 > _maxImpliedKmh) return;
+    }
+
     final newLatLng = LatLng(pos.latitude, pos.longitude);
     final speedKmh = pos.speed * 3.6; // m/s → km/h
 

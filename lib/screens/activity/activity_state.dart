@@ -18,6 +18,8 @@ class ActivityState {
     this.routeSegments = const [],
     this.currentPosition,
     this.permissionDenied = false,
+    this.gpsError,
+    this.saveError,
   });
 
   final RideStatus status;
@@ -33,11 +35,18 @@ class ActivityState {
   final List<List<LatLng>> routeSegments;
   final LatLng? currentPosition;
   final bool permissionDenied;
+  /// Non-null when the GPS stream emitted an error during an active ride.
+  final String? gpsError;
+  /// Non-null when the database failed to save the ride on the last attempt.
+  final String? saveError;
 
   bool get isMoving => speedKmh > 0.5;
   bool get isActive => status == RideStatus.active;
   bool get isPaused => status == RideStatus.paused;
   bool get isIdle => status == RideStatus.idle;
+
+  // Sentinel used in copyWith to distinguish "not provided" from explicit null.
+  static const Object _absent = Object();
 
   ActivityState copyWith({
     RideStatus? status,
@@ -52,6 +61,8 @@ class ActivityState {
     List<List<LatLng>>? routeSegments,
     LatLng? currentPosition,
     bool? permissionDenied,
+    Object? gpsError = _absent,
+    Object? saveError = _absent,
   }) {
     return ActivityState(
       status: status ?? this.status,
@@ -66,6 +77,8 @@ class ActivityState {
       routeSegments: routeSegments ?? this.routeSegments,
       currentPosition: currentPosition ?? this.currentPosition,
       permissionDenied: permissionDenied ?? this.permissionDenied,
+      gpsError: identical(gpsError, _absent) ? this.gpsError : gpsError as String?,
+      saveError: identical(saveError, _absent) ? this.saveError : saveError as String?,
     );
   }
 }
