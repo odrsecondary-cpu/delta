@@ -3,10 +3,17 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geolocator_android/geolocator_android.dart';
 
 class GpsService {
-  static final _locationSettings = AndroidSettings(
+  // Pre-ride: just show current position on map, no foreground service needed.
+  static final _previewSettings = AndroidSettings(
     accuracy: LocationAccuracy.high,
-    distanceFilter: 3, // meters — skip tiny noise
-    foregroundNotificationConfig: ForegroundNotificationConfig(
+    distanceFilter: 0,
+  );
+
+  // Active ride: foreground service keeps GPS alive with screen off.
+  static final _rideSettings = AndroidSettings(
+    accuracy: LocationAccuracy.high,
+    distanceFilter: 3,
+    foregroundNotificationConfig: const ForegroundNotificationConfig(
       notificationTitle: 'Gamma',
       notificationText: 'Recording your ride in the background',
       enableWakeLock: true,
@@ -22,8 +29,11 @@ class GpsService {
         permission == LocationPermission.whileInUse;
   }
 
-  Stream<Position> positionStream() =>
-      Geolocator.getPositionStream(locationSettings: _locationSettings);
+  Stream<Position> previewStream() =>
+      Geolocator.getPositionStream(locationSettings: _previewSettings);
+
+  Stream<Position> rideStream() =>
+      Geolocator.getPositionStream(locationSettings: _rideSettings);
 }
 
 final gpsServiceProvider = Provider<GpsService>((_) => GpsService());

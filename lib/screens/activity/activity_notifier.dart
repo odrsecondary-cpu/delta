@@ -44,7 +44,7 @@ class ActivityNotifier extends Notifier<ActivityState> {
       state = state.copyWith(permissionDenied: true);
       return;
     }
-    _bgLocationSub = gps.positionStream().listen(
+    _bgLocationSub = gps.previewStream().listen(
       (pos) {
         state = state.copyWith(
           currentPosition: LatLng(pos.latitude, pos.longitude),
@@ -75,7 +75,7 @@ class ActivityNotifier extends Notifier<ActivityState> {
       gpsError: null,
     );
     _startTicker();
-    _gpsSub = gps.positionStream().listen(
+    _gpsSub = gps.rideStream().listen(
       _onPosition,
       onError: (Object _) {
         _ticker?.cancel();
