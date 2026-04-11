@@ -155,23 +155,36 @@ class ActivityNotifier extends Notifier<ActivityState> {
   }
 
   void _onPosition(Position pos) {
-    // Layer 1: drop fixes the device itself flags as inaccurate.
-    if (pos.accuracy > _maxAccuracyM) return;
-
-    // Layer 2: drop fixes that imply a physically impossible speed jump.
-    if (state.trackPoints.isNotEmpty && !_justResumed) {
-      final last = state.trackPoints.last;
-      final distM = _distanceCalc(
-        last.position,
-        LatLng(pos.latitude, pos.longitude),
-      ).toDouble();
-      final dtSec =
-          pos.timestamp.difference(last.timestamp).inMilliseconds / 1000.0;
-      if (dtSec >= 0.001 && distM / dtSec * 3.6 > _maxImpliedKmh) return;
-    }
-
     final newLatLng = LatLng(pos.latitude, pos.longitude);
     final speedKmh = pos.speed * 3.6; // m/s → km/h
+
+    // Layer 1: drop fixes the device itself flags as inaccurate from the
+    // recorded track, but still move the visible marker.
+    if (pos.accuracy > _maxAccuracyM) {
+      state = state.copyWith(
+        currentPosition: newLatLng,
+        altitudeM: pos.altitude,
+        speedKmh: speedKmh,
+      );
+      return;
+    }
+
+    // Layer 2: drop fixes that imply a physically impossible speed jump from
+    // the recorded track, but still move the visible marker.
+    if (state.trackPoints.isNotEmpty && !_justResumed) {
+      final last = state.trackPoints.last;
+      final distM = _distanceCalc(last.position, newLatLng).toDouble();
+      final dtSec =
+          pos.timestamp.difference(last.timestamp).inMilliseconds / 1000.0;
+      if (dtSec >= 0.001 && distM / dtSec * 3.6 > _maxImpliedKmh) {
+        state = state.copyWith(
+          currentPosition: newLatLng,
+          altitudeM: pos.altitude,
+          speedKmh: speedKmh,
+        );
+        return;
+      }
+    }
 
     if (state.status == RideStatus.paused) {
       // During pause: move the marker but don't record anything.
