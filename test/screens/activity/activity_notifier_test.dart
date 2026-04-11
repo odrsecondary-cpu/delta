@@ -66,7 +66,7 @@ void main() {
 
     test('should become active when GPS permission is granted', () async {
       when(() => mockGps.requestPermission()).thenAnswer((_) async => true);
-      when(() => mockGps.positionStream())
+      when(() => mockGps.rideStream())
           .thenAnswer((_) => const Stream.empty());
 
       await container.activityNotifier.startRide();
@@ -79,7 +79,7 @@ void main() {
   group('pause / resume', () {
     setUp(() async {
       when(() => mockGps.requestPermission()).thenAnswer((_) async => true);
-      when(() => mockGps.positionStream())
+      when(() => mockGps.rideStream())
           .thenAnswer((_) => const Stream.empty());
       await container.activityNotifier.startRide();
     });
@@ -99,7 +99,9 @@ void main() {
   group('saveAndStop', () {
     test('should save ride and reset to idle with zeroed metrics', () async {
       when(() => mockGps.requestPermission()).thenAnswer((_) async => true);
-      when(() => mockGps.positionStream())
+      when(() => mockGps.rideStream())
+          .thenAnswer((_) => const Stream.empty());
+      when(() => mockGps.previewStream())
           .thenAnswer((_) => const Stream.empty());
       when(() => mockDb.insertRide(any())).thenAnswer((_) async => 1);
 
@@ -120,7 +122,7 @@ void main() {
         () async {
       final positions = [_makePosition(lat: 51.500, lng: -0.090, speedMs: 5.0, altM: 10)];
       when(() => mockGps.requestPermission()).thenAnswer((_) async => true);
-      when(() => mockGps.positionStream())
+      when(() => mockGps.rideStream())
           .thenAnswer((_) => Stream.fromIterable(positions));
 
       await container.activityNotifier.startRide();
@@ -140,7 +142,7 @@ void main() {
         _makePosition(lat: 51.501, lng: -0.090, speedMs: 8.0, altM: 12),
       ];
       when(() => mockGps.requestPermission()).thenAnswer((_) async => true);
-      when(() => mockGps.positionStream())
+      when(() => mockGps.rideStream())
           .thenAnswer((_) => Stream.fromIterable(positions));
 
       await container.activityNotifier.startRide();
@@ -158,7 +160,7 @@ void main() {
         _makePosition(lat: 51.500, lng: -0.090, speedMs: 5.0, altM: 10),
       ];
       when(() => mockGps.requestPermission()).thenAnswer((_) async => true);
-      when(() => mockGps.positionStream())
+      when(() => mockGps.rideStream())
           .thenAnswer((_) => Stream.fromIterable(positions));
 
       await container.activityNotifier.startRide();
