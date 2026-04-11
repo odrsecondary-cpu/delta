@@ -6,6 +6,34 @@ import 'package:latlong2/latlong.dart';
 import '../../../core/theme/app_theme.dart';
 import '../activity_notifier.dart';
 
+/// Chaikin corner-cutting algorithm — turns a jagged GPS polyline into a
+/// smooth curve without external dependencies.
+///
+/// Each [iterations] pass roughly doubles the point count, so 2–3 passes
+/// are enough for visual smoothness.
+List<LatLng> _smooth(List<LatLng> points, {int iterations = 2}) {
+  if (points.length < 3) return points;
+  var pts = points;
+  for (var i = 0; i < iterations; i++) {
+    final out = <LatLng>[pts.first];
+    for (var j = 0; j < pts.length - 1; j++) {
+      final a = pts[j];
+      final b = pts[j + 1];
+      out.add(LatLng(
+        a.latitude * 0.75 + b.latitude * 0.25,
+        a.longitude * 0.75 + b.longitude * 0.25,
+      ));
+      out.add(LatLng(
+        a.latitude * 0.25 + b.latitude * 0.75,
+        a.longitude * 0.25 + b.longitude * 0.75,
+      ));
+    }
+    out.add(pts.last);
+    pts = out;
+  }
+  return pts;
+}
+
 /// Full-width map panel showing the live GPS route and current position.
 class MapPanel extends ConsumerStatefulWidget {
   const MapPanel({super.key});
@@ -65,7 +93,7 @@ class _MapPanelState extends ConsumerState<MapPanel> {
                   for (final seg in actState.routeSegments)
                     if (seg.length >= 2)
                       Polyline(
-                        points: seg,
+                        points: _smooth(seg),
                         color: AppColors.green,
                         strokeWidth: 3,
                       ),
